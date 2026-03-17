@@ -1,0 +1,5 @@
+{
+  "name": "invokix",
+  "private": true,
+  "workspaces": ["web", "cli"]
+}
