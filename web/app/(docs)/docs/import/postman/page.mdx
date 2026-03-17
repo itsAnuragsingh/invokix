@@ -1,0 +1,120 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsStep } from "@/components/docs/DocsStep"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Postman Collection — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Postman Collection
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  Already living in Postman? Export your collection and paste it into Invokix. Your entire API becomes a live contract with types, hooks, and a mock server in seconds.
+</p>
+
+## How to export from Postman
+
+<DocsStep step={1} title="Open your collection in Postman">
+  In the left sidebar, find the collection you want to import. Right-click the collection name and select **Export** from the context menu.
+</DocsStep>
+
+<DocsStep step={2} title="Select Collection v2.1 format">
+  Postman will ask which format to export. Always choose **Collection v2.1** — this is the format Invokix supports. Click **Export** and save the `.json` file anywhere on your machine.
+</DocsStep>
+
+<DocsStep step={3} title="Paste into Invokix" last>
+  Go to your Invokix project and click **Import → Postman Collection**. Open the exported JSON file in any text editor, select all (`Ctrl+A`), copy, and paste it into the input. Click **Import**.
+
+  Invokix converts your collection to a full OpenAPI 3.0 contract and generates all code outputs immediately.
+</DocsStep>
+
+## What transfers
+
+When you import a Postman collection, Invokix maps your collection structure to an OpenAPI contract:
+
+- Every request becomes an endpoint with the correct HTTP method and path
+- Request bodies are converted to typed request schemas
+- Saved response examples become response schemas with inferred types
+- Folder structure in Postman becomes tags that group your endpoints
+- Environment variables like `{{baseUrl}}` are stripped and replaced with a clean base path
+- Collection-level auth settings are mapped to `securitySchemes`
+
+## What does not transfer
+
+Some Postman concepts have no equivalent in an API contract:
+
+- **Pre-request scripts** — these are test automation, not part of your API design
+- **Test assertions** — same reason
+- **Dynamic variables** — `{{$randomEmail}}` and similar are replaced with static examples
+- **Collection runs and monitors** — these are Postman-specific workflow features
+
+## After importing
+
+Postman collections are designed for testing, not documentation. After import your contract will likely have a lower Health Score than a hand-written OpenAPI spec — missing descriptions, no error response schemas, and some inferred types that need confirming.
+
+This is expected and normal. Open the **Health Score** tab and work through the issues — most teams get to 90+ in about 10 minutes using the built-in Monaco editor.
+
+## Example — what your import looks like
+
+If your Postman collection has a `POST /orders` request with a saved body like this:
+
+<DocsCode lang="json" title="Postman request body example">
+{`{
+  "price": 149.99,
+  "lineItems": [
+    {
+      "productId": "prod_123",
+      "quantity": 2,
+      "price": 74.99
+    }
+  ]
+}`}
+</DocsCode>
+
+Invokix generates this contract schema automatically:
+
+<DocsCode lang="yaml" title="Generated OpenAPI schema">
+{`CreateOrderBody:
+  type: object
+  properties:
+    price:
+      type: number
+      example: 149.99
+    lineItems:
+      type: array
+      items:
+        type: object
+        properties:
+          productId:
+            type: string
+            example: "prod_123"
+          quantity:
+            type: number
+            example: 2
+          price:
+            type: number
+            example: 74.99
+            
+            `}
+</DocsCode>
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/health-score", title: "Health Score", desc: "Clean up your imported contract" },
+    { href: "/docs/codegen/types", title: "TypeScript Types", desc: "What gets generated from your spec" },
+    { href: "/docs/mock-server", title: "Mock Server", desc: "Start building before your backend is ready" },
+    { href: "/docs/import/openapi", title: "Switch to OpenAPI", desc: "For better accuracy and full control" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

@@ -1,0 +1,72 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Share Page — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Share Page
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  Every contract has a public shareable link. Share it with clients, external partners, or any developer who needs to consume your API — no login required, always reflects the latest published version.
+</p>
+
+## Your shareable link
+
+Every project has a permanent public URL:
+
+<DocsCode lang="text" title="Your contract share URL">
+{`https://invokix.dev/share/your-project-id`}
+</DocsCode>
+
+Anyone with this link can view your contract without creating an Invokix account. The page always shows the latest published version — you never need to update the link after publishing.
+
+## What visitors see
+
+The share page gives external developers everything they need to consume your API:
+
+- Full contract — every endpoint with request and response schemas
+- One-click copy for TypeScript types
+- One-click copy for React Query v5 hooks
+- One-click copy for Zod schemas
+- One-click copy for React Native hooks
+- Mock server URL — ready to use immediately
+- Auto-generated changelog — every version diff in plain English
+- Current version number and last published date
+
+## Who to share it with
+
+**External integration partners** — give them the link instead of sending PDF docs or Notion pages. They always have the latest version. When you publish a new version, their link updates automatically.
+
+**Client developers** — clients building on top of your API get types and hooks in one click. No back-and-forth email chains.
+
+**New team members** — the share page is the fastest onboarding doc for any engineer joining the project. Everything they need is in one place.
+
+**Open source API consumers** — if your API is public, the share page is your public API documentation.
+
+## Keeping the link private
+
+If you do not want your contract to be publicly accessible, go to **Project Settings → Sharing** and disable the public share link. Only invited team members can access the contract while the link is disabled.
+
+You can re-enable the public link at any time.
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/team", title: "Team & Invites", desc: "Invite teammates directly instead of sharing a link" },
+    { href: "/docs/versions", title: "Version History", desc: "Changelog shown on the share page" },
+    { href: "/docs/mock-server", title: "Mock Server", desc: "Mock URL shown on the share page" },
+    { href: "/docs/slack-alerts", title: "Slack Alerts", desc: "Notify partners when the contract updates" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

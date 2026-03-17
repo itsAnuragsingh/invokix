@@ -1,0 +1,144 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Breaking Change Protection — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Breaking Change Protection
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  Before any contract update is published, Invokix runs an automatic breaking change analysis. If dangerous changes are detected, you see exactly which teams will break and which files need updating — before a single line of production code is affected.
+</p>
+
+## What triggers the gate
+
+Not every contract change is breaking. Invokix classifies every diff automatically:
+
+<div className="not-prose my-6 rounded-xl border border-border/50 overflow-hidden">
+  <table className="w-full text-xs">
+    <thead>
+      <tr className="border-b border-border/50 bg-muted/20">
+        <th className="text-left px-4 py-2.5 font-semibold text-foreground">Change</th>
+        <th className="text-left px-4 py-2.5 font-semibold text-foreground">Classification</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr className="border-b border-border/20 hover:bg-muted/10 transition-colors">
+        <td className="px-4 py-2.5"><code className="text-primary bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5 text-xs font-mono">totalAmount</code><span className="text-muted-foreground"> renamed to </span><code className="text-primary bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5 text-xs font-mono">price</code></td>
+        <td className="px-4 py-2.5 text-red-400 font-medium">Breaking</td>
+      </tr>
+      <tr className="border-b border-border/20 hover:bg-muted/10 transition-colors">
+        <td className="px-4 py-2.5 text-muted-foreground">Field type changed</td>
+        <td className="px-4 py-2.5 text-red-400 font-medium">Breaking</td>
+      </tr>
+      <tr className="border-b border-border/20 hover:bg-muted/10 transition-colors">
+        <td className="px-4 py-2.5 text-muted-foreground">Required field added to request body</td>
+        <td className="px-4 py-2.5 text-red-400 font-medium">Breaking</td>
+      </tr>
+      <tr className="border-b border-border/20 hover:bg-muted/10 transition-colors">
+        <td className="px-4 py-2.5 text-muted-foreground">Field removed from response</td>
+        <td className="px-4 py-2.5 text-red-400 font-medium">Breaking</td>
+      </tr>
+      <tr className="border-b border-border/20 hover:bg-muted/10 transition-colors">
+        <td className="px-4 py-2.5 text-muted-foreground">Endpoint removed</td>
+        <td className="px-4 py-2.5 text-red-400 font-medium">Breaking</td>
+      </tr>
+      <tr className="border-b border-border/20 hover:bg-muted/10 transition-colors">
+        <td className="px-4 py-2.5 text-muted-foreground">Optional field added to response</td>
+        <td className="px-4 py-2.5 text-emerald-400 font-medium">Non-breaking</td>
+      </tr>
+      <tr className="border-b border-border/20 hover:bg-muted/10 transition-colors">
+        <td className="px-4 py-2.5 text-muted-foreground">New endpoint added</td>
+        <td className="px-4 py-2.5 text-emerald-400 font-medium">Non-breaking</td>
+      </tr>
+      <tr>
+        <td className="px-4 py-2.5 text-muted-foreground">Description or example updated</td>
+        <td className="px-4 py-2.5 text-emerald-400 font-medium">Non-breaking</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## What you see before publishing
+
+When Invokix detects a breaking change, the publish button opens a review modal instead of publishing immediately:
+
+<DocsCode lang="text" title="Breaking change gate — review modal">
+{`Breaking Changes Detected — Review Before Publishing
+
+Changes you are about to publish:
+  ✗  totalAmount: number  →  renamed to  price: number
+  ✗  userDetails object   →  renamed to  user object
+
+Teams currently on v1.1 who will be affected:
+  →  Frontend Team    (pulled 3 days ago)
+  →  Mobile Team      (pulled 1 day ago)
+  →  PayCo Partner    (viewer link, on v1.0)
+
+  [ Cancel ]    [ Force Publish — I know what I'm doing ]`}
+</DocsCode>
+
+You see every breaking change, every affected team, and exactly when they last pulled. You can cancel and fix the contract, or force publish if you have already coordinated with the affected teams.
+
+## What happens after force publish
+
+When you force publish a breaking change, Invokix does three things immediately:
+
+- Creates a version snapshot so you can roll back if needed
+- Sends Slack, Discord, and email alerts to every affected team with the exact diff
+- Updates the mock server so it returns the new shape immediately
+
+Teams that have configured Slack or email alerts receive a message like this within 30 seconds:
+
+<DocsCode lang="text" title="Slack alert sent to affected teams">
+{`Invokix — Breaking Change Published
+Orders API  v1.1 → v1.2  (published by Anurag)
+
+Breaking changes:
+  ✗  totalAmount: number  →  price: number
+  ✗  userDetails object   →  user object
+
+Your contract outputs have been updated.
+Pull the latest types to fix your project.`}
+</DocsCode>
+
+## Pulling the latest types after a breaking change
+
+Once you receive the alert, pull the latest generated outputs into your project using the CLI:
+
+<DocsCode lang="bash" title="Terminal">
+{`npx invokix pull
+
+✔ Contract: Orders API v1.2
+✔ Writing: src/types/orders.ts      — updated
+✔ Writing: src/hooks/useOrders.ts   — updated
+✔ Writing: src/schemas/orders.ts    — updated
+
+Breaking changes in this version:
+  ✗  totalAmount renamed to price
+  ✗  userDetails renamed to user
+
+Update your code to use the new field names.`}
+</DocsCode>
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/slack-alerts", title: "Slack Alerts", desc: "Set up alerts so your team is notified instantly" },
+    { href: "/docs/versions", title: "Version History", desc: "Roll back to a previous version if needed" },
+    { href: "/docs/cli", title: "CLI", desc: "Pull the latest types after a breaking change" },
+    { href: "/docs/team", title: "Team & Invites", desc: "Who gets notified and how to manage access" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

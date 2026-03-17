@@ -1,0 +1,91 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Version History — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Version History
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  Every publish creates a permanent snapshot of your contract. Compare any two versions side by side, roll back to any previous version in one click, and see a human-readable changelog generated automatically on every release.
+</p>
+
+## How versioning works
+
+Every time you click Publish, Invokix creates a new version snapshot. The version number increments automatically — `v1.0`, `v1.1`, `v1.2`. Breaking changes increment the minor version. Non-breaking changes increment the patch version.
+
+Every snapshot stores the complete contract at that point in time — not just the diff. This means you can always roll back to an exact previous state, not just undo the last change.
+
+## Version history page
+
+Open the **History** tab in your project to see a full list of every version ever published:
+
+<DocsCode lang="text" title="Version history — Orders API">
+{`v1.3   Mar 8    Added GET /orders/search endpoint       Shruti
+v1.2   Mar 5    Renamed totalAmount → price             Anurag   BREAKING
+v1.1   Mar 3    Added status enum + GET /orders/:id     Anurag
+v1.0   Mar 1    Initial Orders API contract             Anurag`}
+</DocsCode>
+
+Breaking versions are flagged clearly. Click any version to see the full contract at that point in time.
+
+## Visual diff between versions
+
+Select any two versions and click **Compare**. Invokix shows a side-by-side diff with additions in green and removals in red — at the field level, not just the raw spec level.
+
+<DocsCode lang="text" title="Visual diff — v1.1 vs v1.2">
+{`Order schema
+
+  id          string (uuid)    — unchanged
+  price       number           + ADDED (renamed from totalAmount)
+  totalAmount number           - REMOVED (renamed to price)
+  status      string (enum)    — unchanged
+  user        object           + ADDED (renamed from userDetails)
+  userDetails object           - REMOVED (renamed to user)
+  lineItems   LineItem[]       — unchanged`}
+</DocsCode>
+
+## Rolling back
+
+Click **Rollback** on any version in the history list. Invokix restores that version as the current contract, creates a new version snapshot documenting the rollback, and restarts the mock server with the restored contract.
+
+A rollback is treated as a new publish — it triggers change alerts to your team and runs the breaking change gate if the restored version differs from the current one.
+
+## Auto-generated changelog
+
+Every version has a human-readable changelog generated automatically from the diff. The changelog is visible on your shareable contract link — no manual writing required.
+
+<DocsCode lang="text" title="Auto-generated changelog">
+{`v1.2 — March 5, 2025  (Anurag)
+  BREAKING  Renamed totalAmount → price in Order schema
+  BREAKING  Renamed userDetails → user object
+  Added     Optional discount field on Order
+  Removed   Deprecated legacyId field
+
+v1.1 — March 3, 2025  (Anurag)
+  Added     status enum — pending, shipped, delivered, cancelled
+  Added     GET /orders/:id endpoint
+  Updated   Order schema description`}
+</DocsCode>
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/breaking-changes", title: "Breaking Changes", desc: "How Invokix detects and classifies changes" },
+    { href: "/docs/slack-alerts", title: "Slack Alerts", desc: "Notify your team when a new version is published" },
+    { href: "/docs/share", title: "Share Page", desc: "Changelog is public on your shareable link" },
+    { href: "/docs/cli", title: "CLI", desc: "Pull a specific version into your project" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

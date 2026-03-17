@@ -1,0 +1,117 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Mock Server — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Mock Server
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  Every time you publish a contract, Invokix starts a live mock server automatically. Your frontend and mobile engineers build against real endpoints with realistic data — before your backend team writes a single route.
+</p>
+
+## How it works
+
+When you publish, Invokix reads your OpenAPI contract and starts a Prism-compatible mock server. The server returns realistic fake data that matches your schema exactly — correct types, correct field names, correct enum values, correct formats like UUIDs and ISO dates.
+
+Your mock URL is always available in the **Mock** tab of your project. It updates automatically every time you publish a new version.
+
+## Your mock URL
+
+<DocsCode lang="bash" title="Your mock server URL format">
+{`https://invokix.dev/mock/your-project-id
+
+# Every endpoint in your contract is available immediately
+GET  https://invokix.dev/mock/your-project-id/orders
+POST https://invokix.dev/mock/your-project-id/orders
+GET  https://invokix.dev/mock/your-project-id/orders/550e8400-e29b-41d4-a716-446655440000
+DEL  https://invokix.dev/mock/your-project-id/orders/550e8400-e29b-41d4-a716-446655440000`}
+</DocsCode>
+
+## Example responses
+
+The mock server generates realistic data from your schema — not just empty objects or placeholder strings.
+
+<DocsCode lang="json" title="GET /orders — mock response">
+{`[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "price": 149.99,
+    "status": "pending",
+    "userId": "a87ff679-a2f3-471d-8305-cf3b83a70698",
+    "createdAt": "2025-03-01T10:30:00Z",
+    "lineItems": [
+      {
+        "id": "c4ca4238-a0b9-3382-8dcc-509a6f75849b",
+        "productId": "prod_abc123",
+        "quantity": 2,
+        "price": 74.99
+      }
+    ]
+  }
+]`}
+</DocsCode>
+
+## Using the mock server during development
+
+Point your app at the mock URL during development. When your real backend is ready, swap one environment variable.
+
+<DocsCode lang="typescript" title="src/lib/api.ts">
+{`const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://invokix.dev/mock/your-project-id"
+
+export async function getOrders() {
+  const res = await fetch(BASE_URL + "/orders")
+  if (!res.ok) throw new Error("Failed to fetch orders")
+  return res.json()
+}
+
+export async function createOrder(body: CreateOrderBody) {
+  const res = await fetch(BASE_URL + "/orders", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error("Failed to create order")
+  return res.json()
+}`}
+</DocsCode>
+
+<DocsCode lang="bash" title=".env.local — development">
+{`# During development — uses Invokix mock server
+NEXT_PUBLIC_API_URL=https://invokix.dev/mock/your-project-id`}
+</DocsCode>
+
+<DocsCode lang="bash" title=".env.production — when backend is ready">
+{`# In production — uses your real backend
+NEXT_PUBLIC_API_URL=https://api.yourcompany.com`}
+</DocsCode>
+
+## Authentication is stripped
+
+The mock server never enforces authentication. You do not need to send JWT tokens or API keys to the mock server — every request returns data regardless of auth headers. This is intentional so your frontend team can build without needing auth infrastructure set up first.
+
+## Mock server and contract versions
+
+The mock server always reflects your **latest published version**. When you publish v1.2, the mock server restarts with the new contract within seconds. If your frontend is still on v1.1 types and the mock server is now returning v1.2 shapes — that is the breaking change gate working as intended.
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/breaking-changes", title: "Breaking Changes", desc: "What happens when the mock server shape changes" },
+    { href: "/docs/environments", title: "Environments", desc: "Switch between mock, staging, and production" },
+    { href: "/docs/codegen/hooks", title: "React Query Hooks", desc: "Generated hooks that point to your mock URL" },
+    { href: "/docs/versions", title: "Version History", desc: "Roll back the mock server to a previous version" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

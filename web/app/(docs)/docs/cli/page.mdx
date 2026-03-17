@@ -1,0 +1,273 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsStep } from "@/components/docs/DocsStep"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "CLI — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# CLI — `npx invokix pull`
+
+<div className="not-prose flex items-center gap-2 mt-2 mb-6">
+  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">New</span>
+</div>
+
+<p className="text-base text-foreground/80 leading-relaxed mb-8">
+  The Invokix CLI pulls the latest TypeScript types, React Query hooks, Zod schemas, and React Native hooks from any project directly into your codebase. One command. No browser. No copy-paste. Every time you run it, your code outputs are perfectly in sync with the latest published contract.
+</p>
+
+## How to run it
+
+The CLI requires no global installation. You run it with `npx` — a tool that comes built into Node.js. `npx` downloads and runs the CLI automatically the first time, and uses a cached version every time after.
+
+Open your terminal, navigate to your project folder, and run:
+
+<DocsCode lang="bash" title="Terminal">
+{`npx invokix pull`}
+</DocsCode>
+
+That is it. The first time you run this command, the CLI walks you through a short setup. Every time after, it pulls silently in seconds.
+
+## First run — what happens step by step
+
+The very first time you run `npx invokix pull` in a project, the CLI does not know who you are or which contract to pull. It asks you a series of questions to get set up. This only happens once per project.
+
+<DocsStep step={1} title="The CLI starts and checks for authentication">
+  When you first run the command, the CLI checks whether you are already authenticated. Since this is your first time, you are not. It asks you to choose how you want to log in:
+
+  <DocsCode lang="bash" title="Terminal">
+{`Invokix CLI v1.0.0
+
+You are not logged in. How would you like to authenticate?
+
+  1. Browser login  — opens invokix.dev in your browser (recommended)
+  2. API key        — paste a key from your Invokix dashboard
+
+> `}
+  </DocsCode>
+
+  You type `1` or `2` and press Enter.
+</DocsStep>
+
+<DocsStep step={2} title="Option A — Browser login">
+  If you choose browser login, the CLI opens `invokix.dev/cli-auth` in your default browser automatically. You will see a page asking you to confirm the login.
+
+  <DocsCode lang="bash" title="Terminal — while waiting for browser">
+{`Opening invokix.dev/cli-auth in your browser...
+Waiting for authentication...`}
+  </DocsCode>
+
+  In your browser, you will already be logged in to Invokix if you have used it before. Click **Confirm** to authorise the CLI. The browser page shows a success message and you can close the tab.
+
+  Back in your terminal, the CLI confirms authentication automatically:
+
+  <DocsCode lang="bash" title="Terminal — after confirming in browser">
+{`Authenticated as anurag@yourcompany.com`}
+  </DocsCode>
+
+  Your login is saved securely to your machine. You will not need to log in again on this computer unless you explicitly log out.
+</DocsStep>
+
+<DocsStep step={3} title="Option B — API key">
+  If you choose API key, the CLI asks you to paste one:
+
+  <DocsCode lang="bash" title="Terminal">
+{`Paste your Invokix API key:
+> `}
+  </DocsCode>
+
+  To get an API key, go to your Invokix dashboard → **Account Settings → API Keys** → **New Key**. Give it a name like `local-dev` or `laptop` so you can identify it later. Copy the key — it is only shown once.
+
+  Paste it into the terminal and press Enter. The CLI verifies it immediately:
+
+  <DocsCode lang="bash" title="Terminal — after pasting key">
+{`Authenticated as anurag@yourcompany.com`}
+  </DocsCode>
+
+  Your key is saved to your machine. You will not need to paste it again.
+
+  **For CI/CD pipelines** — add the key as an environment variable called `INVOKIX_API_KEY`. The CLI reads it automatically without asking. See the CI/CD section below for the full setup.
+</DocsStep>
+
+<DocsStep step={4} title="Select your project">
+  Once authenticated, the CLI fetches all projects you have access to and asks which one you want to pull from:
+
+  <DocsCode lang="bash" title="Terminal">
+{`Which project do you want to pull from?
+
+  1. Orders API
+  2. Payments API
+  3. User Auth Service
+
+> `}
+  </DocsCode>
+
+  Type the number and press Enter.
+</DocsStep>
+
+<DocsStep step={5} title="Choose your output folder">
+  The CLI asks where to write the generated files. It suggests `src/` as a default but you can type any folder that exists in your project:
+
+  <DocsCode lang="bash" title="Terminal">
+{`Where should Invokix write the generated files?
+  Common choices: src/  app/  lib/  ./
+
+Output folder (src/): `}
+  </DocsCode>
+
+  Press Enter to accept `src/` or type your folder — for example `app/` for a Next.js project without a `src` directory, or `./` to write files directly to the project root.
+</DocsStep>
+
+<DocsStep step={6} title="Choose which outputs to pull">
+  The CLI asks which outputs you need. Select all that apply to your project:
+
+  <DocsCode lang="bash" title="Terminal">
+{`Which outputs do you need? (space to select, enter to confirm)
+
+  [x] TypeScript types
+  [x] React Query v5 hooks
+  [x] Zod schemas
+  [ ] React Native hooks
+
+> `}
+  </DocsCode>
+
+  Use the spacebar to toggle each option. Press Enter when done.
+</DocsStep>
+
+<DocsStep step={7} title="Files are written and config is saved" last>
+  The CLI pulls the latest published contract and writes all selected outputs to your chosen folder:
+
+  <DocsCode lang="bash" title="Terminal — first pull complete">
+{`Pulling from: Orders API v1.2
+
+  Writing: src/types/orders.ts        done
+  Writing: src/hooks/useOrders.ts     done
+  Writing: src/schemas/orders.ts      done
+
+All outputs synced to v1.2
+
+Configuration saved to invokix.config.json
+Run "npx invokix pull" any time to get the latest version.`}
+  </DocsCode>
+
+  The CLI saves your choices to a file called `invokix.config.json` in your project root. This means every engineer on your team can run `npx invokix pull` without going through setup again — the config file tells the CLI everything it needs.
+</DocsStep>
+
+## Subsequent runs
+
+After the first run, every pull is silent and fast. The CLI reads `invokix.config.json`, authenticates automatically, and writes the latest outputs:
+
+<DocsCode lang="bash" title="Terminal — regular pull">
+{`npx invokix pull
+
+Pulling from: Orders API v1.3
+
+  Writing: src/types/orders.ts        updated
+  Writing: src/hooks/useOrders.ts     updated
+  Writing: src/schemas/orders.ts      no changes
+
+All outputs synced to v1.3
+
+Breaking changes in v1.3:
+  ✗  totalAmount renamed to price
+  ✗  userDetails renamed to user
+
+Search your codebase for these field names and update them.`}
+</DocsCode>
+
+When there are breaking changes, the CLI tells you exactly what changed. Run `tsc --noEmit` after pulling to find every file in your codebase that references the old field names.
+
+## The config file — `invokix.config.json`
+
+After first run, a file called `invokix.config.json` is saved to your project root. This file stores your project settings — not your credentials. It is safe to commit to version control.
+
+<DocsCode lang="json" title="invokix.config.json">
+{`{
+  "projectId": "proj_abc123",
+  "contractId": "contract_xyz789",
+  "outputDir": "src/",
+  "outputs": ["types", "hooks", "schemas"]
+}`}
+</DocsCode>
+
+**Commit this file.** When another engineer on your team clones the repo and runs `npx invokix pull` for the first time, the CLI reads this file and skips the project selection and folder questions. They only need to authenticate — one step instead of six.
+
+## Using the CLI in CI/CD
+
+In a CI/CD pipeline there is no browser and no one to paste an API key. Use an environment variable instead.
+
+Go to **Account Settings → API Keys → New Key**. Name it something like `github-actions` or `ci-pipeline`. Copy the key.
+
+Add it as a secret in your CI/CD platform — in GitHub Actions it goes under **Repository Settings → Secrets → New repository secret**. Name it `INVOKIX_API_KEY`.
+
+The CLI reads this environment variable automatically — no interactive prompts, no browser, no manual input.
+
+<DocsCode lang="yaml" title=".github/workflows/ci.yml">
+{`name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Pull latest contract outputs
+        run: npx invokix pull
+        env:
+          INVOKIX_API_KEY: your-key-from-secrets
+
+      - name: Type check
+        run: pnpm tsc --noEmit
+
+      - name: Build
+        run: pnpm build`}
+</DocsCode>
+
+Every CI run now pulls the latest contract outputs before building. If a breaking change was published and your code still references old field names, the type check step fails before anything reaches production.
+
+## Logging out
+
+To log out of the CLI on your current machine:
+
+<DocsCode lang="bash" title="Terminal">
+{`npx invokix logout
+
+Logged out of anurag@yourcompany.com
+Run "npx invokix pull" to log in again.`}
+</DocsCode>
+
+## Consumer tracking
+
+Every `npx invokix pull` is logged in your Invokix project. Your team can see exactly who pulled which version and when — in the **Consumers** section of your project dashboard. This is how Invokix knows which teams are affected when you publish a breaking change. Only the teams who have actually pulled the contract get notified — not everyone on the project.
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/breaking-changes", title: "Breaking Changes", desc: "What the CLI tells you when a breaking change is detected" },
+    { href: "/docs/codegen/types", title: "TypeScript Types", desc: "What the CLI pulls into your project" },
+    { href: "/docs/stacks/nextjs", title: "Next.js Stack Guide", desc: "Full setup guide including CLI integration" },
+    { href: "/docs/stacks/express", title: "Express Stack Guide", desc: "Using the CLI with a Node.js backend" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

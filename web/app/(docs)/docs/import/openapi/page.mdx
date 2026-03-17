@@ -1,0 +1,109 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "OpenAPI / Swagger — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# OpenAPI / Swagger
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  The fastest way to get started. Paste any OpenAPI 3.0 or Swagger 2.0 spec and Invokix generates all outputs instantly — free on all plans.
+</p>
+
+## What is OpenAPI
+
+OpenAPI is the industry standard for describing REST APIs. If your backend already has a `swagger.json`, `openapi.yaml`, or an auto-generated spec from a framework like FastAPI, NestJS, or Express — you can import it directly.
+
+## How to import
+
+Go to your project and click **Import**. Select **OpenAPI / Swagger**. Paste your spec as JSON or YAML and click **Import**. Invokix validates it instantly and generates all outputs.
+
+## Supported formats
+
+- OpenAPI 3.0 and 3.1 — JSON or YAML
+- Swagger 2.0 — JSON or YAML
+- Inline `$ref` references are resolved automatically
+
+## Example spec
+
+<DocsCode lang="yaml" title="openapi.yaml">
+{`openapi: 3.0.0
+info:
+  title: Orders API
+  version: 1.0.0
+
+paths:
+  /orders:
+    get:
+      summary: List orders
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+    post:
+      summary: Create order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderBody'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+components:
+  schemas:
+    Order:
+      type: object
+      required: [id, price, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        price:
+          type: number
+          minimum: 0
+        status:
+          type: string
+          enum: [pending, shipped, delivered, cancelled]
+
+    CreateOrderBody:
+      type: object
+      required: [price]
+      properties:
+        price:
+          type: number
+          minimum: 0`}
+</DocsCode>
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/codegen/types", title: "TypeScript Types", desc: "What gets generated from your spec" },
+    { href: "/docs/codegen/hooks", title: "React Query Hooks", desc: "Auto-generated hooks for every endpoint" },
+    { href: "/docs/health-score", title: "Health Score", desc: "Fix issues in your spec after import" },
+    { href: "/docs/mock-server", title: "Mock Server", desc: "Start building before your backend is ready" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

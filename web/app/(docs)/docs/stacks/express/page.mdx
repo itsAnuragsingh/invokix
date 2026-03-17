@@ -1,0 +1,115 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsStep } from "@/components/docs/DocsStep"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Express / Node Stack — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Express / Node
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  A complete guide to using Invokix with an Express or Node.js backend. Import your routes directly, keep your contract in sync with your code, and give your frontend team types and hooks the moment your API design is ready.
+</p>
+
+## What Invokix generates for this stack
+
+- TypeScript types for every request and response schema
+- Zod validation schemas to use in your route handlers
+- A shareable contract link for your frontend and mobile teams
+
+## Importing your Express routes
+
+If you already have an Express app, paste your route files into Invokix using the **Route Code** import. Invokix reads your TypeScript types and Zod schemas and generates a complete OpenAPI contract automatically.
+
+<DocsCode lang="typescript" title="routes/orders.ts — paste this into Invokix">
+{`import { Router, Request, Response } from "express"
+import { z } from "zod"
+
+const router = Router()
+
+const CreateOrderSchema = z.object({
+  price: z.number().positive(),
+  lineItems: z.array(z.object({
+    productId: z.string(),
+    quantity: z.number().int().positive(),
+    price: z.number().positive(),
+  })).min(1),
+})
+
+// GET /orders
+router.get("/orders", async (req: Request, res: Response) => {
+  const orders = await db.orders.findAll()
+  res.json(orders)
+})
+
+// POST /orders
+router.post("/orders", async (req: Request, res: Response) => {
+  const parsed = CreateOrderSchema.safeParse(req.body)
+  if (!parsed.success) {
+    return res.status(400).json({ error: "Invalid body" })
+  }
+  const order = await db.orders.create(parsed.data)
+  res.status(201).json(order)
+})
+
+export { router as ordersRouter }`}
+</DocsCode>
+
+## Using Zod schemas from Invokix in your routes
+
+Pull the generated Zod schemas from Invokix and use them directly in your route handlers. This guarantees your validation always matches your contract.
+
+<DocsCode lang="bash" title="Terminal">
+{`npx invokix pull`}
+</DocsCode>
+
+<DocsCode lang="typescript" title="routes/orders.ts — using pulled schemas">
+{`import { CreateOrderBodySchema } from "@/schemas/orders"
+
+router.post("/orders", async (req, res) => {
+  const parsed = CreateOrderBodySchema.safeParse(req.body)
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: "Invalid request body",
+      issues: parsed.error.issues,
+    })
+  }
+
+  const order = await db.orders.create(parsed.data)
+  res.status(201).json(order)
+})`}
+</DocsCode>
+
+## Keeping your contract in sync with your code
+
+When you change a route, update the contract in Invokix and publish. Your frontend team gets updated types and hooks immediately. Use the CLI in your development workflow:
+
+<DocsCode lang="bash" title="Terminal — after changing a route">
+{`# Update contract in Invokix, then pull updated schemas
+npx invokix pull
+
+# Your Zod schemas now reflect the updated contract
+# TypeScript will catch any mismatches in your route handlers`}
+</DocsCode>
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/import/code", title: "Route Code Import", desc: "Import your Express routes automatically" },
+    { href: "/docs/codegen/zod", title: "Zod Schemas", desc: "Use contract schemas in your route handlers" },
+    { href: "/docs/breaking-changes", title: "Breaking Changes", desc: "Protect your frontend team when routes change" },
+    { href: "/docs/cli", title: "CLI Reference", desc: "Pull latest schemas into your backend project" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

@@ -1,0 +1,80 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Contract Health Score — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Contract Health Score
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  Every contract gets a live score from 0 to 100. The score reflects how complete, consistent, and production-ready your API contract is. Every issue has a specific fix — and hitting 100 means your contract is genuinely solid.
+</p>
+
+## What the score measures
+
+The health score is calculated across five categories. Each category has a set of rules. Every rule that fails deducts points from your score.
+
+**Missing error schemas** — every endpoint should have `401`, `404`, and `500` response schemas defined. An endpoint that only documents the happy path is incomplete.
+
+**Undescribed fields** — every request and response field should have a `description`. Fields with no description make it impossible for consumers to understand what the field means without reading the source code.
+
+**Deprecated fields without sunset dates** — if you mark a field as deprecated, you must set a sunset date. A deprecated field with no timeline gives consumers no way to plan their migration.
+
+**Naming inconsistencies** — mixing `snake_case` and `camelCase` across your contract is a common source of bugs. Invokix flags any field that breaks the naming convention used by the majority of your contract.
+
+**Undocumented endpoints** — endpoints with no summary or description make your contract harder to understand and harder to generate accurate code from.
+
+## Example score breakdown
+
+<DocsCode lang="text" title="Health Score — Orders API">
+{`Contract Health: 74 / 100
+
+Issues found (5):
+
+  Missing error schemas
+  ✗  GET /orders        — missing 401, 500 response schemas
+  ✗  POST /orders       — missing 400, 500 response schemas
+
+  Undescribed fields
+  ✗  Order.lineItems    — no description
+  ✗  CreateOrderBody.price — no description
+
+  Naming inconsistency
+  ✗  user_id vs userId  — mixed snake_case and camelCase across 3 endpoints
+
+Fix all issues to reach 100 / 100`}
+</DocsCode>
+
+## Fixing issues
+
+Every issue in the health score links directly to the affected part of your contract in the Monaco editor. Click any issue to jump to it and fix it inline.
+
+Most contracts imported from Postman collections start between 50 and 70. Contracts written from scratch using the plain English generator start between 80 and 90. A hand-maintained OpenAPI spec with full descriptions and error schemas hits 95 to 100.
+
+## Health score and publishing
+
+Your health score does not block publishing — you can publish a contract with a score of 40. The score is informational. It is designed to give you a clear, specific list of things to improve rather than a vague sense that something might be wrong.
+
+Teams that maintain a high health score consistently produce better-quality code outputs — more accurate types, more complete Zod validation, and mock server responses that more closely match their real API behaviour.
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/import/openapi", title: "OpenAPI Import", desc: "Start with a well-structured spec for a higher score" },
+    { href: "/docs/breaking-changes", title: "Breaking Changes", desc: "Protect your team when you update the contract" },
+    { href: "/docs/codegen/types", title: "TypeScript Types", desc: "Better health score means better generated types" },
+    { href: "/docs/mock-server", title: "Mock Server", desc: "Higher scores produce more accurate mock responses" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

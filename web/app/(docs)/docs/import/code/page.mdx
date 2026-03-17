@@ -1,0 +1,158 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Route Code (AI) — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Route Code
+
+<div className="not-prose flex items-center gap-2 mt-2 mb-6">
+  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-400 border border-violet-500/20">AI Feature</span>
+</div>
+
+<p className="text-base text-foreground/80 leading-relaxed mb-8">
+  Already have a backend? Paste your route code directly — Express, Next.js, Fastify, Hono, or NestJS. Invokix reads your code and generates a complete OpenAPI contract from it automatically.
+</p>
+
+## How it works
+
+Paste your route file into the input. Invokix reads your route definitions, infers request and response shapes from your TypeScript types and Zod schemas, and produces a complete OpenAPI 3.0 contract. The result opens in the editor for review before you publish.
+
+This works best when your routes have:
+- TypeScript types on request bodies and responses
+- Zod validation schemas — Invokix reads these directly
+- Consistent HTTP status codes in your responses
+
+## Example — Next.js App Router
+
+<DocsCode lang="typescript" title="app/api/orders/route.ts">
+{`import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
+import { db } from "@/lib/db"
+import { orders } from "@/lib/db/schema"
+import { requireSession } from "@/lib/auth/session"
+
+const CreateOrderSchema = z.object({
+  price: z.number().positive(),
+  lineItems: z.array(z.object({
+    productId: z.string(),
+    quantity: z.number().int().positive(),
+    price: z.number().positive(),
+  }))
+})
+
+// GET /api/orders — list user orders
+export async function GET(req: NextRequest) {
+  const session = await requireSession()
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const userOrders = await db.select().from(orders)
+  return NextResponse.json(userOrders)
+}
+
+// POST /api/orders — create a new order
+export async function POST(req: NextRequest) {
+  const session = await requireSession()
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const body = await req.json()
+  const parsed = CreateOrderSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid body" }, { status: 400 })
+  }
+
+  const order = await db.insert(orders).values({
+    ...parsed.data,
+    userId: session.user.id,
+    status: "pending",
+  }).returning()
+
+  return NextResponse.json(order[0], { status: 201 })
+}`}
+</DocsCode>
+
+Invokix reads this and generates the following contract:
+
+<DocsCode lang="yaml" title="Generated contract">
+{`paths:
+  /api/orders:
+    get:
+      summary: List user orders
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '401':
+          description: Unauthorized
+    post:
+      summary: Create a new order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderBody'
+      responses:
+        '201':
+          description: Order created
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized`}
+</DocsCode>
+
+## Supported frameworks
+
+- **Next.js** — App Router `route.ts` handlers and Pages Router API routes
+- **Express** — `router.get()`, `router.post()`, `app.use()` patterns
+- **Fastify** — route definitions with inline schema objects
+- **Hono** — `app.get()`, `app.post()` with Zod validators
+- **NestJS** — controller classes with `@Get()`, `@Post()` decorators
+
+## Tips for better extraction
+
+- **Use Zod** — if you validate request bodies with Zod, Invokix reads the schema directly and produces the most accurate types
+- **Add TypeScript return types** — `Promise<Order>` gives the AI exact response shape information
+- **Paste multiple routes at once** — paste the entire file, not just one handler
+- **Include comments** — `// GET /orders — list user orders` helps the AI write better summaries
+
+## Accuracy
+
+Route code extraction handles most patterns well. Complex cases — database-inferred return types, deeply nested conditional responses, or dynamic schema builders — may need manual cleanup in the editor after extraction.
+
+Once your contract is stable, consider switching to **OpenAPI import** and maintaining the spec directly. It gives you full control and produces higher Health Scores.
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/import/openapi", title: "Switch to OpenAPI", desc: "Maintain your spec directly for full control" },
+    { href: "/docs/health-score", title: "Health Score", desc: "Find and fix gaps after extraction" },
+    { href: "/docs/codegen/types", title: "TypeScript Types", desc: "Generated from your extracted contract" },
+    { href: "/docs/mock-server", title: "Mock Server", desc: "Start building against your contract immediately" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

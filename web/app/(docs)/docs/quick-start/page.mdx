@@ -1,0 +1,106 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsStep } from "@/components/docs/DocsStep"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Quick Start — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Quick Start
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  Get your first contract, types, and mock server running in under 2 minutes.
+</p>
+
+<DocsStep step={1} title="Create a project">
+  Go to your <Link href="/dashboard">dashboard</Link> and click **New Project**. Give it a name and choose your stack — Next.js, React Native, Express, or Angular. Your stack controls which code outputs are generated.
+</DocsStep>
+
+<DocsStep step={2} title="Import or generate your contract">
+  You have three options:
+
+  - **Paste an OpenAPI spec** — if you already have a `swagger.json` or `openapi.yaml`, paste it directly. Free on all plans.
+  - **Paste a Postman collection** — export your collection as JSON and paste it. Invokix converts it automatically.
+  - **Describe in plain English** — type what your API does and Invokix generates a complete OpenAPI 3.0 spec in seconds using AI.
+
+  <DocsCode lang="text" title="Example plain English input">
+{`Orders API — users can create orders, view history, cancel pending orders.
+Each order has line items, total price, and status.
+JWT auth. Razorpay for payments.`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={3} title="Generate your code outputs">
+  Once your contract is imported, click **Generate**. Invokix produces all outputs instantly based on your stack:
+
+  - TypeScript types — always
+  - React Query v5 hooks — Next.js and React stacks
+  - Zod validation schemas — all stacks
+  - React Native hooks — React Native stack
+
+  <DocsCode lang="typescript" title="Generated: src/types/orders.ts">
+{`export type Order = {
+  id: string
+  price: number
+  status: "pending" | "shipped" | "delivered" | "cancelled"
+  userId: string
+  createdAt: string
+  lineItems: LineItem[]
+}
+
+export type LineItem = {
+  id: string
+  productId: string
+  quantity: number
+  price: number
+}`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={4} title="Publish your contract">
+  Click **Publish** to create the first version of your contract. Publishing does three things:
+
+  - Creates a version snapshot you can roll back to at any time
+  - Starts the live mock server automatically
+  - Sends Slack and email alerts to your team if configured
+
+  Before publishing, Invokix checks for breaking changes. If any field renames, type changes, or removals are detected — you see exactly which teams will be affected and can cancel or force publish.
+</DocsStep>
+
+<DocsStep step={5} title="Share with your team" last>
+  Copy the mock URL from the **Mock** tab and share it with your frontend and mobile engineers. They can start building immediately — no backend needed.
+
+  <DocsCode lang="typescript" title="Using your Invokix mock server">
+{`// During development — points to Invokix mock server
+const BASE_URL = "https://invokix.dev/mock/your-project-id"
+
+const orders = await fetch(\`\${BASE_URL}/orders\`)
+// → [{ id: "uuid", price: 49.99, status: "pending", ... }]
+
+// When your backend is ready — swap one line
+const BASE_URL = "https://api.yourcompany.com"`}
+  </DocsCode>
+
+  Invite teammates from **Settings → Team**. They receive an email invite and can access the project as an editor or viewer.
+</DocsStep>
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+  {[
+    { href: "/docs/mock-server", title: "Mock Server", desc: "How Invokix generates realistic fake data" },
+    { href: "/docs/breaking-changes", title: "Breaking Changes", desc: "How the pre-publish gate works" },
+    { href: "/docs/codegen/hooks", title: "React Query Hooks", desc: "Generated hook patterns and usage" },
+    { href: "/docs/team", title: "Team & Invites", desc: "Roles, permissions, and inviting teammates" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

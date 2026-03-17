@@ -1,0 +1,107 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsStep } from "@/components/docs/DocsStep"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Angular Stack — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Angular
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  A complete guide to using Invokix with an Angular project. Get TypeScript types and Zod schemas from your contract and use them directly in your services and components.
+</p>
+
+## What Invokix generates for this stack
+
+- TypeScript types for every schema in your contract
+- Zod validation schemas for runtime type safety
+- A shareable contract link for your team
+
+## Setup
+
+<DocsStep step={1} title="Install dependencies">
+  <DocsCode lang="bash" title="Terminal">
+{`npm install zod`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={2} title="Pull your contract outputs">
+  <DocsCode lang="bash" title="Terminal">
+{`npx invokix pull`}
+  </DocsCode>
+
+  <DocsCode lang="bash" title="Generated files">
+{`src/types/orders.ts      — TypeScript types
+src/schemas/orders.ts    — Zod validation schemas`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={3} title="Use types in your Angular service" last>
+  <DocsCode lang="typescript" title="src/app/orders/orders.service.ts">
+{`import { Injectable } from "@angular/core"
+import { HttpClient } from "@angular/common/http"
+import { Observable } from "rxjs"
+import { map } from "rxjs/operators"
+import type { Order, CreateOrderBody } from "@/types/orders"
+import { OrderSchema } from "@/schemas/orders"
+import { z } from "zod"
+
+@Injectable({ providedIn: "root" })
+export class OrdersService {
+  private baseUrl = "https://api.yourcompany.com"
+
+  constructor(private http: HttpClient) {}
+
+  getOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(this.baseUrl + "/orders").pipe(
+      map((data) => z.array(OrderSchema).parse(data))
+    )
+  }
+
+  createOrder(body: CreateOrderBody): Observable<Order> {
+    return this.http.post<Order>(this.baseUrl + "/orders", body).pipe(
+      map((data) => OrderSchema.parse(data))
+    )
+  }
+}`}
+  </DocsCode>
+</DocsStep>
+
+## Keeping outputs in sync
+
+Run `npx invokix pull` any time your backend team publishes a contract update. TypeScript will immediately surface any places in your Angular app that reference renamed or removed fields.
+
+<DocsCode lang="bash" title="Terminal — after a contract update">
+{`npx invokix pull
+
+✔ Contract: Orders API v1.3
+✔ Writing: src/types/orders.ts      — updated
+✔ Writing: src/schemas/orders.ts    — updated
+
+Breaking changes in v1.3:
+  ✗  totalAmount renamed to price
+
+Run tsc to find all affected files.`}
+</DocsCode>
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/codegen/types", title: "TypeScript Types", desc: "Full reference for generated types" },
+    { href: "/docs/codegen/zod", title: "Zod Schemas", desc: "Runtime validation for API responses" },
+    { href: "/docs/cli", title: "CLI Reference", desc: "Pull latest outputs into your Angular project" },
+    { href: "/docs/breaking-changes", title: "Breaking Changes", desc: "Get notified when the contract changes" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

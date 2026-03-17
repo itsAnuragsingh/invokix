@@ -1,0 +1,117 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsStep } from "@/components/docs/DocsStep"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "React Native Stack — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# React Native
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  A complete guide to using Invokix with a React Native or Expo project. Get mobile-optimised hooks, shared types, and Zod schemas — all from the same contract your web team uses.
+</p>
+
+## What Invokix generates for this stack
+
+- TypeScript types shared with your web team — same contract, same types
+- React Native optimised hooks — `refetchOnWindowFocus: false`, `networkMode: "always"`, `retry: 2`
+- Zod validation schemas for request body validation
+
+## Setup
+
+<DocsStep step={1} title="Install dependencies">
+  <DocsCode lang="bash" title="Terminal">
+{`pnpm add @tanstack/react-query zod`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={2} title="Set up QueryClientProvider">
+  <DocsCode lang="typescript" title="App.tsx">
+{`import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+
+const queryClient = new QueryClient()
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RootNavigator />
+    </QueryClientProvider>
+  )
+}`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={3} title="Pull your contract outputs">
+  <DocsCode lang="bash" title="Terminal">
+{`npx invokix pull`}
+  </DocsCode>
+
+  <DocsCode lang="bash" title="Generated files">
+{`src/types/orders.ts             — TypeScript types
+src/hooks/native/useOrders.ts   — React Native optimised hooks
+src/schemas/orders.ts           — Zod validation schemas`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={4} title="Use the generated hooks in your screens" last>
+  <DocsCode lang="typescript" title="screens/OrdersScreen.tsx">
+{`import { View, Text, FlatList, ActivityIndicator } from "react-native"
+import { useGetOrders } from "@/hooks/native/useOrders"
+
+export function OrdersScreen() {
+  const { data: orders, isLoading, error } = useGetOrders()
+
+  if (isLoading) return <ActivityIndicator />
+  if (error) return <Text>Something went wrong</Text>
+
+  return (
+    <FlatList
+      data={orders}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <View>
+          <Text>{item.status}</Text>
+          <Text>{item.price}</Text>
+        </View>
+      )}
+    />
+  )
+}`}
+  </DocsCode>
+</DocsStep>
+
+## Sharing types with your web team
+
+If you have a monorepo with both a Next.js app and a React Native app, both can pull from the same Invokix contract. The TypeScript types are identical — only the hooks differ between web and mobile.
+
+<DocsCode lang="bash" title="Monorepo structure">
+{`apps/
+  web/          — Next.js app
+    src/types/orders.ts          — pulled from Invokix
+    src/hooks/useOrders.ts       — web hooks
+  mobile/       — React Native app
+    src/types/orders.ts          — same types, pulled from Invokix
+    src/hooks/useOrders.ts       — mobile hooks`}
+</DocsCode>
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/codegen/react-native", title: "React Native Hooks", desc: "Full reference for generated mobile hooks" },
+    { href: "/docs/codegen/types", title: "TypeScript Types", desc: "Shared types used by web and mobile" },
+    { href: "/docs/cli", title: "CLI Reference", desc: "Pull latest outputs into your mobile project" },
+    { href: "/docs/mock-server", title: "Mock Server", desc: "Build screens before your backend exists" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

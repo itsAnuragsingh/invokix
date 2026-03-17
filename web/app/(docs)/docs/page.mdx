@@ -1,0 +1,62 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsFeatureGrid } from "@/components/docs/DocsFeatureGrid"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Introduction — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Introduction
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  Invokix is your API contract platform. Design, generate, sync, and protect your entire API contract in one place — and keep your whole team in sync, forever.
+</p>
+
+## The problem
+
+Every developer team has lived this story. A backend engineer renames a field on Tuesday afternoon. The frontend engineer spends Wednesday morning debugging a broken screen. The mobile engineer rewrites fetch functions from scratch — again. By Friday's demo, nobody knows why the client integration is broken.
+
+The root cause is always the same: your API has no home. Changes happen in Slack, in code, in memory — never in one place that everyone trusts.
+
+## What Invokix does
+
+Invokix gives your API a permanent home. One platform where your contract is always current, your code outputs are always in sync, and your team is always notified the moment anything changes.
+
+<DocsFeatureGrid />
+
+## Who it is for
+
+Invokix is built for small and medium developer teams who are tired of API drift — the gap between what was agreed and what was actually built.
+
+**Backend engineers** design the contract before writing code. When they rename a field or remove an endpoint, they see exactly who will be affected before publishing. No more silent breaking changes.
+
+**Frontend engineers** always have the latest types and hooks. They never wait for the backend team — the mock server means they can build against a live API from day one.
+
+**Mobile engineers** get React Native hooks generated automatically from the same contract. They never rewrite fetch functions from scratch when the backend changes.
+
+**Team leads** see exactly who is consuming which version of the contract. They know before publishing whether a change will break two teams or twenty.
+
+## How a typical workflow looks
+
+A backend engineer opens Invokix and describes the new Payments API in plain English. Invokix generates a complete contract in seconds. The frontend engineer immediately gets TypeScript types and React Query hooks. The mobile engineer gets React Native hooks. The mock server starts automatically — both teams start building before a single backend route exists.
+
+Three days later, the backend engineer needs to rename a field. They open Invokix, make the change, and click Publish. Invokix detects the breaking change and shows exactly which files in the frontend and mobile codebases reference the old field name. The engineer shares the alert with both teams. Everyone updates their code before the change ever reaches production.
+
+That is what Invokix is for.
+
+## Next steps
+
+<div className="not-prose flex flex-col sm:flex-row gap-3 mt-6">
+  <Link href="/docs/quick-start" className="flex-1 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors p-4 group">
+    <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Quick Start →</p>
+    <p className="text-xs text-muted-foreground mt-1">Get your first contract running in 2 minutes</p>
+  </Link>
+  <Link href="/docs/import/openapi" className="flex-1 rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+    <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Import existing API →</p>
+    <p className="text-xs text-muted-foreground mt-1">Already have a spec or Postman collection? Start here.</p>
+  </Link>
+</div>
+
+</DocsPageWrapper>

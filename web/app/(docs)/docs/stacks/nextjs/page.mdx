@@ -1,0 +1,158 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsStep } from "@/components/docs/DocsStep"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Next.js / React Stack — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Next.js / React
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  A complete guide to using Invokix with a Next.js or React project. From pulling your first types to wiring up React Query hooks and validating with Zod — everything in one place.
+</p>
+
+## What Invokix generates for this stack
+
+- TypeScript types for every schema in your contract
+- React Query v5 hooks for every endpoint
+- Zod validation schemas matching your contract exactly
+
+## Setup
+
+<DocsStep step={1} title="Install dependencies">
+  <DocsCode lang="bash" title="Terminal">
+{`pnpm add @tanstack/react-query zod`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={2} title="Set up QueryClientProvider">
+  Wrap your app in a `QueryClientProvider`. In Next.js App Router, create a client component for this:
+
+  <DocsCode lang="typescript" title="components/Providers.tsx">
+{`"use client"
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { useState } from "react"
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient())
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  )
+}`}
+  </DocsCode>
+
+  <DocsCode lang="typescript" title="app/layout.tsx">
+{`import { Providers } from "@/components/Providers"
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  )
+}`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={3} title="Pull your contract outputs">
+  Run the CLI to pull types, hooks, and schemas into your project:
+
+  <DocsCode lang="bash" title="Terminal">
+{`npx invokix pull`}
+  </DocsCode>
+
+  This creates three files in your `src/` directory:
+
+  <DocsCode lang="bash" title="Generated files">
+{`src/types/orders.ts      — TypeScript types
+src/hooks/useOrders.ts   — React Query v5 hooks
+src/schemas/orders.ts    — Zod validation schemas`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={4} title="Use the generated hooks in your components">
+  <DocsCode lang="typescript" title="app/orders/page.tsx">
+{`import { useGetOrders } from "@/hooks/useOrders"
+
+export default function OrdersPage() {
+  const { data: orders, isLoading } = useGetOrders()
+
+  if (isLoading) return <p>Loading...</p>
+
+  return (
+    <ul>
+      {orders?.map((order) => (
+        <li key={order.id}>{order.status} — {order.price}</li>
+      ))}
+    </ul>
+  )
+}`}
+  </DocsCode>
+</DocsStep>
+
+<DocsStep step={5} title="Validate API routes with Zod schemas" last>
+  Use the generated schemas to validate request bodies in your API routes:
+
+  <DocsCode lang="typescript" title="app/api/orders/route.ts">
+{`import { NextRequest, NextResponse } from "next/server"
+import { CreateOrderBodySchema } from "@/schemas/orders"
+
+export async function POST(req: NextRequest) {
+  const body = await req.json()
+
+  const parsed = CreateOrderBodySchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid body", issues: parsed.error.issues },
+      { status: 400 }
+    )
+  }
+
+  // parsed.data is fully typed
+  const { price, lineItems } = parsed.data
+  // ... create the order
+}`}
+  </DocsCode>
+</DocsStep>
+
+## Keeping outputs in sync
+
+Add the CLI to your CI pipeline so types are always up to date:
+
+<DocsCode lang="yaml" title=".github/workflows/ci.yml">
+{`- name: Pull latest contract outputs
+  run: npx invokix pull
+  env:
+    INVOKIX_API_KEY: INVOKIX_API_KEY
+
+- name: Type check
+  run: pnpm tsc --noEmit`}
+</DocsCode>
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/codegen/hooks", title: "React Query Hooks", desc: "Full reference for generated hooks" },
+    { href: "/docs/codegen/zod", title: "Zod Schemas", desc: "Full reference for generated schemas" },
+    { href: "/docs/cli", title: "CLI Reference", desc: "All CLI commands and configuration options" },
+    { href: "/docs/breaking-changes", title: "Breaking Changes", desc: "What happens when your contract changes" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

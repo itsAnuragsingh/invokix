@@ -1,0 +1,82 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Slack Alerts — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Slack Alerts
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  When a contract changes, every affected team member knows within 30 seconds. Slack, Discord, and email alerts deliver the exact diff — what changed, who changed it, and what needs updating — directly to your team.
+</p>
+
+## Setting up Slack alerts
+
+Go to **Project Settings → Alerts**. Paste your Slack incoming webhook URL and click Save. That is the entire setup — no OAuth, no Slack app approval, no bot installation.
+
+To create a webhook URL in Slack:
+- Go to `api.slack.com/apps`
+- Create a new app or open an existing one
+- Enable **Incoming Webhooks**
+- Add a new webhook and select the channel you want alerts posted to
+- Copy the webhook URL and paste it into Invokix
+
+## What an alert looks like
+
+<DocsCode lang="text" title="Slack alert — breaking change published">
+{`Invokix — Breaking Change Published
+Orders API  v1.1 → v1.2
+
+Published by: Anurag
+Time: March 5, 2025 at 2:34 PM
+
+Breaking changes:
+  ✗  totalAmount: number  →  price: number
+  ✗  userDetails object   →  user object
+
+Non-breaking changes:
+  +  Added optional discount field on Order
+  +  Added GET /orders/search endpoint
+
+Pull the latest contract outputs to update your project.`}
+</DocsCode>
+
+## Discord alerts
+
+Paste your Discord channel webhook URL into **Project Settings → Alerts → Discord Webhook**. Discord webhooks work identically to Slack — the same alert format is delivered to your Discord channel.
+
+To get a Discord webhook URL: open your Discord server settings → Integrations → Webhooks → New Webhook. Select the channel and copy the URL.
+
+## Email alerts
+
+Add email addresses under **Project Settings → Alerts → Email Recipients**. Every address in the list receives an email alert when the contract is published. You can add as many addresses as you need — individual engineers, team distribution lists, or external partners.
+
+## Alert types
+
+You can configure which events trigger alerts:
+
+**Breaking changes only** — alerts fire only when a breaking change is published. Non-breaking additions and description updates are silent. Recommended for most teams.
+
+**All changes** — alerts fire on every publish, breaking or not. Useful for external partners who want to know about every update.
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/breaking-changes", title: "Breaking Changes", desc: "What triggers a breaking change alert" },
+    { href: "/docs/team", title: "Team & Invites", desc: "Who receives alerts and how to manage access" },
+    { href: "/docs/versions", title: "Version History", desc: "Full audit trail of every published change" },
+    { href: "/docs/share", title: "Share Page", desc: "A public link for partners to follow along" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

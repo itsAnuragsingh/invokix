@@ -1,0 +1,74 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Team & Invites — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Team & Invites
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  Invite your entire team to a project in seconds. Every member gets the right level of access — editors can modify the contract, viewers can read and consume outputs but cannot change anything.
+</p>
+
+## Roles
+
+Every project member has one of three roles:
+
+**Owner** — full control. Can modify the contract, publish, invite members, change roles, and delete the project. The person who creates a project is the owner by default.
+
+**Editor** — can modify the contract, publish new versions, and invite new viewers. Cannot delete the project or change billing.
+
+**Viewer** — read-only access. Can view the contract, copy generated outputs, and receive change alerts. Cannot modify the contract or publish.
+
+External partners and clients should always be invited as viewers.
+
+## Inviting a teammate
+
+Go to **Project Settings → Team** and enter the email address of the person you want to invite. Select their role and click **Send Invite**.
+
+Invokix sends them an email with a link to accept the invite. When they accept, they are added to the project immediately. If they do not have an Invokix account yet, the invite link takes them through signup first.
+
+Invite links expire after 7 days. You can resend or revoke a pending invite from the same settings page.
+
+## Managing existing members
+
+From the Team settings page you can:
+
+- Change a member's role at any time
+- Remove a member from the project
+- See when each member last pulled the contract via the CLI
+- See which version each member is currently on
+
+## External partners as viewers
+
+If you are sharing your API contract with an external partner — a client, an integration partner, or a third-party developer — invite them as a viewer. They get access to:
+
+- The full contract in read-only mode
+- All generated code outputs — types, hooks, schemas
+- The mock server URL
+- The auto-generated changelog
+- Change alerts when the contract updates
+
+They cannot modify anything. You can revoke their access at any time.
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/slack-alerts", title: "Slack Alerts", desc: "Notify your team the moment the contract changes" },
+    { href: "/docs/share", title: "Share Page", desc: "A public link for external partners without invites" },
+    { href: "/docs/breaking-changes", title: "Breaking Changes", desc: "Who gets notified when a breaking change is published" },
+    { href: "/docs/versions", title: "Version History", desc: "See which version each team member is on" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>

@@ -1,0 +1,75 @@
+import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
+import { DocsCode } from "@/components/docs/DocsCode"
+import Link from "next/link"
+
+export const metadata = {
+  title: "Environment Manager — Invokix Docs",
+}
+
+<DocsPageWrapper>
+
+# Environment Manager
+
+<p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
+  Every project has three environments — mock, staging, and production. Switch between them with one click. Every code output and shareable link reflects the active environment automatically.
+</p>
+
+## What environments do
+
+Each environment stores a base URL for your API. When you switch environments, the base URL used in your generated hooks and the shareable contract link updates to match. Your team always builds against the right backend without manually editing URLs.
+
+<DocsCode lang="text" title="Environment Manager — your project">
+{`Environments
+
+  Mock        https://invokix.dev/mock/your-project-id       Active
+  Staging     https://staging.api.yourcompany.com
+  Production  https://api.yourcompany.com`}
+</DocsCode>
+
+## Adding environments
+
+Go to your project and open the **Environments** tab. Click **Add Environment**. Give it a name and a base URL. Set it as default if you want it to be the active environment for new team members.
+
+You can add as many environments as you need — mock, staging, production, preview, local, or any custom environment your team uses.
+
+## Switching environments
+
+Click the environment name to make it active. All generated code outputs update immediately to use the new base URL. The shareable contract link updates too — so external partners always see the correct endpoint URLs.
+
+## Generated hooks use your active environment
+
+When you generate React Query hooks or React Native hooks, the base URL in the generated file reflects your active environment:
+
+<DocsCode lang="typescript" title="Generated hooks — staging environment active">
+{`// Base URL reflects your active environment
+const BASE_URL = "https://staging.api.yourcompany.com"
+
+export function useGetOrders() {
+  return useQuery({
+    queryKey: orderKeys.list(),
+    queryFn: async () => {
+      const res = await fetch(BASE_URL + "/orders")
+      if (!res.ok) throw new Error("Failed to fetch orders")
+      return res.json()
+    },
+  })
+}`}
+</DocsCode>
+
+## Next steps
+
+<div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+  {[
+    { href: "/docs/mock-server", title: "Mock Server", desc: "Your default mock environment" },
+    { href: "/docs/codegen/hooks", title: "React Query Hooks", desc: "Hooks that use your active environment URL" },
+    { href: "/docs/share", title: "Share Page", desc: "Shareable link that reflects your active environment" },
+    { href: "/docs/team", title: "Team & Invites", desc: "Control which environments teammates can see" },
+  ].map(({ href, title, desc }) => (
+    <Link key={href} href={href} className="rounded-xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-primary/30 transition-all p-4 group">
+      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{title} →</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+    </Link>
+  ))}
+</div>
+
+</DocsPageWrapper>
