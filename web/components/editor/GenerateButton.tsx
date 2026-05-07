@@ -1,7 +1,7 @@
 // components/editor/GenerateButton.tsx
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
@@ -30,9 +30,25 @@ const OUTPUT_STATS = [
   { icon: ShieldIcon, label: "Zod Schemas" },
 ]
 
+function getStorageKey(projectId: string) {
+  return `codegen:${projectId}`
+}
+
 export function GenerateButton({ projectId }: GenerateButtonProps) {
   const [loading, setLoading] = useState(false)
   const [generated, setGenerated] = useState<GeneratedCode | null>(null)
+
+  // Restore from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(getStorageKey(projectId))
+      if (saved) {
+        setGenerated(JSON.parse(saved) as GeneratedCode)
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, [projectId])
 
   async function handleGenerate() {
     setLoading(true)
@@ -46,6 +62,12 @@ export function GenerateButton({ projectId }: GenerateButtonProps) {
       if (!json.success) { toast.error(json.error ?? "Generation failed"); return }
 
       setGenerated(json.data)
+      // Persist to localStorage so it survives page reloads
+      try {
+        localStorage.setItem(getStorageKey(projectId), JSON.stringify(json.data))
+      } catch {
+        // quota exceeded or SSR — silently ignore
+      }
       toast.success("Code generated!")
 
       await fetch("/api/consumers", {

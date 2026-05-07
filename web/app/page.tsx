@@ -120,45 +120,54 @@ const PRICING_PLANS = [
   {
     name: "Free",
     price: "$0",
-    description: "For solo developers exploring.",
+    description: "Explore Invokix at your own pace. No card required.",
     features: [
-      "1 project",
+      "1 API contract",
       "2 team members",
-      "Groq AI (10 generations/mo)",
+      "10 AI generations / month",
       "Last 3 versions",
-      "Shareable link",
+      "Shareable contract page",
     ],
-    cta: "Start free",
+    cta: "Get started free",
+  },
+  {
+    name: "Pro",
+    price: "$19",
+    period: "/mo",
+    description: "Everything your team needs to ship APIs with confidence.",
+    features: [
+      "Unlimited API contracts",
+      "Up to 10 team members",
+      "250 AI generations / month",
+      "Full version history & one-click rollback",
+      "Breaking change gate",
+      "Mock server & API validator",
+      "Basic Environment manager — dev, staging, prod",
+      "Slack & Discord alerts",
+      "Consumer tracking",
+      "CLI — npx invokix pull",
+      "Email support",
+    ],
+    cta: "Start 14-day free trial",
+    highlighted: true,
   },
   {
     name: "Team",
     price: "$49",
     period: "/mo",
-    description: "For teams that ship together.",
+    description: "Built for growing teams that need scale and control.",
     features: [
-      "Unlimited projects",
-      "Unlimited members",
-      "Claude Haiku AI",
-      "Full version history",
-      "Slack + Discord alerts",
-      "Consumer tracking",
-      "CLI — npx invokix pull",
-      "Breaking change gate",
+      "Everything in Pro",
+      "Unlimited team members",
+      "Unlimited AI generations",
+      "Multiple workspaces",
+      "Role-based access control",
+      "Contract analytics",
+      "Custom Slack & Discord templates",
+      "Fast-track email support",
     ],
-    cta: "Start free trial",
-    highlighted: true,
-  },
-  {
-    name: "Lifetime",
-    price: "$149",
-    description: "Pay once. Use forever.",
-    features: [
-      "Everything in Team",
-      "Never pay again",
-      "Priority support",
-      "Early access to features",
-    ],
-    cta: "Get lifetime access",
+    cta: "Join the waitlist",
+    comingSoon: true,
   },
 ]
 
@@ -356,9 +365,7 @@ export default function LandingPage() {
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4">
               Simple. Flat. No per-seat nonsense.
             </h2>
-            <p className="text-zinc-400 text-sm sm:text-base">
-              Apidog charges $49 per seat. We charge $49 for your entire team.
-            </p>
+            
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

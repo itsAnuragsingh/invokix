@@ -3,6 +3,8 @@ import { requireSession } from "@/lib/auth/session"
 import { ok, err } from "@/lib/api/response"
 import { getProjectById } from "@/lib/db/queries/projects"
 import { upsertNotifications, getNotificationsByProjectId } from "@/lib/db/queries/notifications"
+import { checkFeatureAccess } from "@/lib/plans/usage"
+import { PLAN_DISPLAY } from "@/lib/plans/limits"
 import { z } from "zod"
 
 const schema = z.object({
@@ -36,6 +38,16 @@ export async function POST(request: Request) {
   try {
     const session = await requireSession()
     if (!session) return err("Unauthorized", "UNAUTHORIZED", 401)
+
+    // ── Plan gate: alerts ───────────────────────────────────────────
+    const access = await checkFeatureAccess(session.user.id, "canAlerts")
+    if (!access.allowed) {
+      return err(
+        `Slack & Discord alerts are available on the Pro plan and above. You're on the ${PLAN_DISPLAY[access.plan].label} plan.`,
+        "PLAN_FEATURE_LOCKED",
+        403
+      )
+    }
 
     const body = await request.json()
     const parsed = schema.safeParse(body)

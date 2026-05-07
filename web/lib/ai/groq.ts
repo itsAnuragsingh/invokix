@@ -5,6 +5,25 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY!,
 })
 
+/** Robustly extract the first valid JSON object from raw LLM output */
+function extractJson(raw: string): string {
+  // 1. Strip common markdown fences
+  let cleaned = raw
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/g, "")
+    .trim()
+
+  // 2. Find the first { and last } to slice out the JSON object
+  const start = cleaned.indexOf("{")
+  const end = cleaned.lastIndexOf("}")
+
+  if (start === -1 || end === -1 || end < start) {
+    throw new Error("No JSON object found in AI response")
+  }
+
+  return cleaned.slice(start, end + 1)
+}
+
 export async function generateSpecFromText(
   plainEnglish: string,
   existingSpec?: object
@@ -80,10 +99,7 @@ Example of a well-formed schema:
   const content = response.choices[0]?.message?.content
   if (!content) throw new Error("No response from AI")
 
-  return content
-    .replace(/```json\n?/g, "")
-    .replace(/```\n?/g, "")
-    .trim()
+  return extractJson(content)
 }
 
 export async function extractSpecFromCode(routeCode: string): Promise<string> {
@@ -107,8 +123,5 @@ Every field must have a realistic example value and proper constraints (minimum:
   const content = response.choices[0]?.message?.content
   if (!content) throw new Error("No response from AI")
 
-  return content
-    .replace(/```json\n?/g, "")
-    .replace(/```\n?/g, "")
-    .trim()
+  return extractJson(content)
 }

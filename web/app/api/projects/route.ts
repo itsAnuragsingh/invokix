@@ -2,6 +2,8 @@
 import { requireSession } from "@/lib/auth/session"
 import { ok, err } from "@/lib/api/response"
 import { getProjectsByUserId, createProject } from "@/lib/db/queries/projects"
+import { checkContractLimit } from "@/lib/plans/usage"
+import { PLAN_DISPLAY } from "@/lib/plans/limits"
 import { z } from "zod"
 
 const createSchema = z.object({
@@ -27,6 +29,16 @@ export async function POST(request: Request) {
     const session = await requireSession()
     if (!session) return err("Unauthorized", "UNAUTHORIZED", 401)
 
+    // ── Plan limit: contracts ────────────────────────────────────────
+    const limit = await checkContractLimit(session.user.id)
+    if (!limit.allowed) {
+      return err(
+        `You've reached the ${PLAN_DISPLAY[limit.plan].label} plan limit of ${limit.limit} project${limit.limit !== 1 ? "s" : ""}. Upgrade to create more.`,
+        "PLAN_LIMIT_EXCEEDED",
+        403
+      )
+    }
+
     const body = await request.json()
     const parsed = createSchema.safeParse(body)
     if (!parsed.success) return err("Invalid request", "INVALID_REQUEST", 400)
@@ -36,4 +48,4 @@ export async function POST(request: Request) {
   } catch {
     return err("Something went wrong", "SERVER_ERROR", 500)
   }
-}
+}

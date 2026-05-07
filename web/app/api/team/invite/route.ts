@@ -6,6 +6,8 @@ import { ok, err } from "@/lib/api/response"
 import { createInvite } from "@/lib/db/queries/team"
 import { sendInviteEmail } from "@/lib/notify/email"
 import { getProjectById } from "@/lib/db/queries/projects"
+import { checkTeamMemberLimit } from "@/lib/plans/usage"
+import { PLAN_DISPLAY } from "@/lib/plans/limits"
 
 const schema = z.object({
   projectId: z.string().min(1),
@@ -33,6 +35,16 @@ export async function POST(req: NextRequest) {
     const project = await getProjectById(projectId, session.user.id)
     if (!project) return err("Project not found", "NOT_FOUND", 404)
 
+    // ── Plan limit: team members ──────────────────────────────────────
+    const teamLimit = await checkTeamMemberLimit(project.ownerId, projectId)
+    if (!teamLimit.allowed) {
+      return err(
+        `Team limit reached (${teamLimit.current}/${teamLimit.limit}) on the ${PLAN_DISPLAY[teamLimit.plan].label} plan. Upgrade to invite more members.`,
+        "PLAN_LIMIT_EXCEEDED",
+        403
+      )
+    }
+
     const result = await createInvite(projectId, session.user.id, email, role)
 
     if ("error" in result) {
@@ -57,4 +69,4 @@ export async function POST(req: NextRequest) {
   } catch {
     return err("Failed to send invite", "INVITE_FAILED", 500)
   }
-}
+}

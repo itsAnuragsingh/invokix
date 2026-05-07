@@ -92,7 +92,7 @@ export async function sendInviteEmail({
             <td style="padding:20px 40px;border-top:1px solid #1e2030;">
               <p style="margin:0;font-size:12px;color:#4a4f6a;">
                 Invokix · Your API's home ·
-                <a href="${APP_URL}" style="color:#7c6af7;text-decoration:none;">invokix.dev</a>
+                <a href="${APP_URL}" style="color:#7c6af7;text-decoration:none;">invokix.com</a>
               </p>
             </td>
           </tr>

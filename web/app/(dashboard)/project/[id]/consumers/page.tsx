@@ -16,6 +16,9 @@ import {
   ShareNetworkIcon,
 } from "@phosphor-icons/react/dist/ssr"
 import Link from "next/link"
+import { getUserPlan } from "@/lib/plans/usage"
+import { PLAN_LIMITS } from "@/lib/plans/limits"
+import { UpgradeBanner } from "@/components/dashboard/UpgradeBanner"
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -27,13 +30,11 @@ export default async function ConsumersPage({ params }: Props) {
   const project = await getProjectById(id, session.user.id)
   if (!project) notFound()
 
+  const plan = await getUserPlan(session.user.id)
+  const limits = PLAN_LIMITS[plan]
+
   const contract = await getContractByProjectId(id)
   if (!contract) redirect(`/project/${id}`)
-
-  const contractConsumers = await db.query.consumers.findMany({
-    where: eq(consumers.contractId, contract.id),
-    orderBy: (consumers, { desc }) => [desc(consumers.lastPulledAt)],
-  })
 
   return (
     <div className="space-y-0 animate-fade-up">
@@ -48,9 +49,6 @@ export default async function ConsumersPage({ params }: Props) {
           </div>
           <div className="flex items-center gap-3">
             <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">Consumers</h1>
-            <Badge variant="outline" className="font-mono text-xs border-primary/30 text-primary bg-primary/5">
-              {contractConsumers.length} total
-            </Badge>
           </div>
           <p className="text-muted-foreground text-sm mt-1">
             Every team consuming this contract — version, source, last seen
@@ -77,7 +75,33 @@ export default async function ConsumersPage({ params }: Props) {
         ))}
       </div>
 
-      <ConsumerTable consumers={contractConsumers} currentVersion={contract.version} />
+      {/* Plan gate */}
+      {!limits.canConsumerTracking ? (
+        <UpgradeBanner
+          feature="Consumer Tracking"
+          requiredPlan="pro"
+          currentPlan={plan}
+          description="See who's consuming your API contracts, what versions they're on, and when they last pulled — available on the Pro plan."
+        />
+      ) : (
+        <ConsumerTableWrapper contractId={contract.id} contractVersion={contract.version} />
+      )}
     </div>
+  )
+}
+
+async function ConsumerTableWrapper({ contractId, contractVersion }: { contractId: string; contractVersion: string }) {
+  const contractConsumers = await db.query.consumers.findMany({
+    where: eq(consumers.contractId, contractId),
+    orderBy: (consumers, { desc }) => [desc(consumers.lastPulledAt)],
+  })
+
+  return (
+    <>
+      <Badge variant="outline" className="font-mono text-xs border-primary/30 text-primary bg-primary/5 mb-4">
+        {contractConsumers.length} total
+      </Badge>
+      <ConsumerTable consumers={contractConsumers} currentVersion={contractVersion} />
+    </>
   )
 }

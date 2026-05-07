@@ -9,6 +9,8 @@ import {
   updateContract,
 } from "@/lib/db/queries/contracts";
 import { mergeSpecs, isEmptySpec } from "@/lib/ai/merge";
+import { checkAiGenerationLimit, recordAiGeneration } from "@/lib/plans/usage";
+import { PLAN_DISPLAY } from "@/lib/plans/limits";
 import { z } from "zod";
 
 const schema = z.object({
@@ -30,6 +32,16 @@ export async function POST(request: Request) {
     const project = await getProjectById(projectId, session.user.id);
     if (!project) return err("Project not found", "NOT_FOUND", 404);
 
+    // ── Plan limit: AI generations ──────────────────────────────────
+    const aiLimit = await checkAiGenerationLimit(session.user.id);
+    if (!aiLimit.allowed) {
+      return err(
+        `You've used all ${aiLimit.limit} AI generations this month on the ${PLAN_DISPLAY[aiLimit.plan].label} plan. Upgrade for more.`,
+        "PLAN_LIMIT_EXCEEDED",
+        403
+      );
+    }
+
     const existing = await getContractByProjectId(projectId);
     const specJson = await generateSpecFromText(
       plainEnglish,
@@ -49,6 +61,8 @@ export async function POST(request: Request) {
       );
     }
 
+    // ── Track AI generation usage ───────────────────────────────────
+    await recordAiGeneration(session.user.id, projectId);
 
     if (!existing) {
       // No contract yet — create fresh
@@ -81,3 +95,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

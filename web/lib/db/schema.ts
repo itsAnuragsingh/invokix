@@ -138,11 +138,20 @@ export const deprecations = pgTable("deprecations", {
 export const subscriptions = pgTable("subscriptions", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  plan: text("plan", { enum: ["free", "starter", "team", "lifetime"] }).notNull().default("free"),
+  plan: text("plan", { enum: ["free", "pro", "team"] }).notNull().default("free"),
   stripeCustomerId: text("stripe_customer_id"),
   razorpayCustomerId: text("razorpay_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
+  dodoCustomerId: text("dodo_customer_id"),
+  dodoSubscriptionId: text("dodo_subscription_id"),
   expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+})
+
+export const aiGenerations = pgTable("ai_generations", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: text("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 })
 
@@ -175,4 +184,23 @@ export const cliSessions = pgTable("cli_sessions", {
   confirmedAt: timestamp("confirmed_at"),   // filled when confirmed
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+})
+
+
+export const templates = pgTable("templates", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category", {
+    enum: ["payments", "auth", "storage", "messaging", "ecommerce", "analytics", "other"],
+  }).notNull().default("other"),
+  openApiSpec: jsonb("open_api_spec").notNull(),
+  tags: text("tags").array().notNull().default([]),
+  forkCount: integer("fork_count").notNull().default(0),
+  isPublic: boolean("is_public").notNull().default(true),
+  createdBy: text("created_by").references(() => users.id),
+  healthScore: integer("health_score").notNull().default(0),
+  endpointCount: integer("endpoint_count").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 })

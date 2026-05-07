@@ -23,13 +23,13 @@ Your mock URL is always available in the **Mock** tab of your project. It update
 ## Your mock URL
 
 <DocsCode lang="bash" title="Your mock server URL format">
-{`https://invokix.dev/mock/your-project-id
+{`https://invokix.com/mock/your-project-id
 
 # Every endpoint in your contract is available immediately
-GET  https://invokix.dev/mock/your-project-id/orders
-POST https://invokix.dev/mock/your-project-id/orders
-GET  https://invokix.dev/mock/your-project-id/orders/550e8400-e29b-41d4-a716-446655440000
-DEL  https://invokix.dev/mock/your-project-id/orders/550e8400-e29b-41d4-a716-446655440000`}
+GET  https://invokix.com/mock/your-project-id/orders
+POST https://invokix.com/mock/your-project-id/orders
+GET  https://invokix.com/mock/your-project-id/orders/550e8400-e29b-41d4-a716-446655440000
+DEL  https://invokix.com/mock/your-project-id/orders/550e8400-e29b-41d4-a716-446655440000`}
 </DocsCode>
 
 ## Example responses
@@ -61,7 +61,7 @@ The mock server generates realistic data from your schema — not just empty obj
 Point your app at the mock URL during development. When your real backend is ready, swap one environment variable.
 
 <DocsCode lang="typescript" title="src/lib/api.ts">
-{`const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://invokix.dev/mock/your-project-id"
+{`const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://invokix.com/mock/your-project-id"
 
 export async function getOrders() {
   const res = await fetch(BASE_URL + "/orders")
@@ -82,7 +82,7 @@ export async function createOrder(body: CreateOrderBody) {
 
 <DocsCode lang="bash" title=".env.local — development">
 {`# During development — uses Invokix mock server
-NEXT_PUBLIC_API_URL=https://invokix.dev/mock/your-project-id`}
+NEXT_PUBLIC_API_URL=https://invokix.com/mock/your-project-id`}
 </DocsCode>
 
 <DocsCode lang="bash" title=".env.production — when backend is ready">

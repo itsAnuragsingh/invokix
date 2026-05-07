@@ -5,6 +5,9 @@ import { auth } from "@/lib/auth/server"
 import { getProjectById } from "@/lib/db/queries/projects"
 import { getContractByProjectId } from "@/lib/db/queries/contracts"
 import { ResponseValidator } from "@/components/editor/ResponseValidator"
+import { getUserPlan } from "@/lib/plans/usage"
+import { PLAN_LIMITS } from "@/lib/plans/limits"
+import { UpgradeBanner } from "@/components/dashboard/UpgradeBanner"
 import type { OpenAPIV3 } from "openapi-types"
 
 type Props = {
@@ -14,15 +17,28 @@ type Props = {
 export default async function ValidatorPage({ params }: Props) {
   const { id } = await params
 
-  // Auth
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) redirect("/login")
 
-  // Load project
   const project = await getProjectById(id, session.user.id)
   if (!project) notFound()
 
-  // Load contract
+  const plan = await getUserPlan(session.user.id)
+  const limits = PLAN_LIMITS[plan]
+
+  if (!limits.canMockAndValidator) {
+    return (
+      <div className="py-8 px-6 max-w-6xl">
+        <UpgradeBanner
+          feature="API Response Validator"
+          requiredPlan="pro"
+          currentPlan={plan}
+          description="Validate live API responses against your contract schema to catch drift — available on the Pro plan."
+        />
+      </div>
+    )
+  }
+
   const contract = await getContractByProjectId(id)
   if (!contract) {
     return (
@@ -35,7 +51,6 @@ export default async function ValidatorPage({ params }: Props) {
     )
   }
 
-  // Extract endpoints from the OpenAPI spec
   const spec = contract.openApiSpec as OpenAPIV3.Document
   const endpoints: { method: string; path: string }[] = []
 

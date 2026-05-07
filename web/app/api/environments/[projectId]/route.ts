@@ -9,6 +9,8 @@ import {
   updateEnvironment,
   deleteEnvironment,
 } from "@/lib/db/queries/environments"
+import { checkFeatureAccess } from "@/lib/plans/usage"
+import { PLAN_DISPLAY } from "@/lib/plans/limits"
 
 type Params = { projectId: string }
 
@@ -55,6 +57,16 @@ export async function POST(
   try {
     const session = await requireSession()
     if (!session) return err("Unauthorized", "UNAUTHORIZED", 401)
+
+    // ── Plan gate: environments ─────────────────────────────────────
+    const access = await checkFeatureAccess(session.user.id, "canEnvironments")
+    if (!access.allowed) {
+      return err(
+        `Environment manager is available on the Pro plan and above. You're on the ${PLAN_DISPLAY[access.plan].label} plan.`,
+        "PLAN_FEATURE_LOCKED",
+        403
+      )
+    }
 
     const { projectId } = await params
     const body = await req.json()

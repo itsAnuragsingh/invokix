@@ -51,44 +51,47 @@ export default async function ProjectPage({ params }: Props) {
     : null
 
   return (
-    <div className="animate-fade-up">
+    <div className="animate-fade-up space-y-6">
 
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 mb-5">
-        <Link href="/dashboard" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+      {/* ── Breadcrumb ──────────────────────────────────────────────── */}
+      <div className="flex items-center gap-2">
+        <Link
+          href="/dashboard"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
           Projects
         </Link>
         <span className="text-muted-foreground/30 text-xs">/</span>
-        <span className="text-xs text-foreground/70">{project.name}</span>
+        <span className="text-xs text-foreground/80 font-medium">{project.name}</span>
       </div>
 
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-            <span className="text-primary font-display font-bold text-sm">
+      {/* ── Header ──────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-11 w-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+            <span className="text-primary font-display font-bold text-base">
               {project.name.charAt(0).toUpperCase()}
             </span>
           </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="font-display text-xl font-bold tracking-tight text-foreground">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-foreground">
                 {project.name}
               </h1>
               {contract && (
-                <span className="font-mono text-[11px] text-primary border border-primary/30 bg-primary/5 px-2 py-0.5 rounded-full">
+                <span className="font-mono text-[11px] text-primary border border-primary/30 bg-primary/5 px-2 py-0.5 rounded-full shrink-0">
                   v{contract.version}
                 </span>
               )}
             </div>
             {project.description && (
-              <p className="text-xs text-muted-foreground/60 mt-0.5">{project.description}</p>
+              <p className="text-xs text-muted-foreground/60 mt-0.5 truncate">{project.description}</p>
             )}
           </div>
         </div>
 
         {contract && (
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 flex-wrap shrink-0">
             <EditSpecModal
               projectId={id}
               currentSpec={contract.openApiSpec as object}
@@ -101,7 +104,7 @@ export default async function ProjectPage({ params }: Props) {
         )}
       </div>
 
-      {/* Stat bar */}
+      {/* ── Stat bar ────────────────────────────────────────────────── */}
       {contract && (
         <ProjectStatBar
           healthScore={contract.healthScore}
@@ -114,25 +117,18 @@ export default async function ProjectPage({ params }: Props) {
         />
       )}
 
-      {/* Nav */}
-      {contract && (
-        <div className="mt-6">
-          <ProjectNav id={id} contractId={contract.id} />
+      {/* ── Nav ─────────────────────────────────────────────────────── */}
+      {contract && <ProjectNav id={id} contractId={contract.id} />}
+
+      {/* ── Content ─────────────────────────────────────────────────── */}
+      {!contract ? (
+        <ImportPanel projectId={id} />
+      ) : (
+        <div className="space-y-6">
+          <EndpointList contract={contract} projectId={id} />
+          <GenerateButton projectId={id} />
         </div>
       )}
-
-      {/* Content */}
-      <div className="mt-6">
-        {!contract ? (
-          <ImportPanel projectId={id} />
-        ) : (
-          <div className="space-y-6">
-            <EndpointList contract={contract} projectId={id} />
-            <GenerateButton projectId={id} />
-          </div>
-        )}
-      </div>
-
     </div>
   )
 }

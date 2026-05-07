@@ -15,6 +15,83 @@ function resolveRef(
   return resolved as OpenAPIV3.SchemaObject
 }
 
+// ── Randomize based on example value + schema hints ──────────────────────────
+function randomizeFromExample(
+  schema: OpenAPIV3.SchemaObject,
+  fieldName: string
+): unknown {
+  const example = schema.example
+  const format = schema.format
+
+  // UUID format — always generate a fresh one
+  if (
+    format === "uuid" ||
+    (typeof example === "string" && /^[0-9a-f-]{36}$/i.test(example))
+  ) {
+    const s = nanoid(32)
+    return `${s.slice(0, 8)}-${s.slice(8, 12)}-${s.slice(12, 16)}-${s.slice(16, 20)}-${s.slice(20)}`
+  }
+
+  // Prefixed IDs like "order_abc123", "pay_abc123", "cus_abc123", "sub_abc123"
+  if (typeof example === "string" && /^[a-z]+_[a-zA-Z0-9]+$/.test(example)) {
+    const prefix = example.split("_")[0]
+    return `${prefix}_${nanoid(8)}`
+  }
+
+  // JWT tokens — generate a fake but realistic-looking token
+  if (
+    typeof example === "string" &&
+    example.startsWith("eyJ")
+  ) {
+    return `eyJhbGciOiJIUzI1NiJ9.${nanoid(32)}.${nanoid(16)}`
+  }
+
+  // Timestamps — return a recent random date within last 30 days
+  if (
+    format === "date-time" ||
+    (typeof example === "string" && /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(example))
+  ) {
+    const offsetMs = Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000
+    return new Date(Date.now() - offsetMs).toISOString()
+  }
+
+  // Date only
+  if (
+    format === "date" ||
+    (typeof example === "string" && /^\d{4}-\d{2}-\d{2}$/.test(example))
+  ) {
+    const offsetMs = Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000
+    return new Date(Date.now() - offsetMs).toISOString().split("T")[0]
+  }
+
+  // Numbers — vary by ±20% around example value
+  if (typeof example === "number") {
+    const variance = example * 0.2
+    const min = Math.max(0, example - variance)
+    const max = example + variance
+    const val = Math.random() * (max - min) + min
+    return schema.type === "integer" ? Math.floor(val) : Math.round(val * 100) / 100
+  }
+
+  // Enums — pick random value instead of always the example
+  if (schema.enum && schema.enum.length > 0) {
+    return schema.enum[Math.floor(Math.random() * schema.enum.length)]
+  }
+
+  // Boolean — randomize
+  if (typeof example === "boolean") {
+    return Math.random() > 0.5
+  }
+
+  // URI — return example as-is (randomizing URLs isn't useful)
+  if (format === "uri" || (typeof example === "string" && example.startsWith("https://"))) {
+    return example
+  }
+
+  // Everything else (emails, phone numbers, names, etc.) — return as-is
+  return example
+}
+
 // ── Generate fake value from schema ──────────────────────────────────────────
 function generateValue(
   spec: OpenAPIV3.Document,
@@ -23,11 +100,15 @@ function generateValue(
 ): unknown {
   const resolved = resolveRef(spec, schema)
 
-  // Use example if provided
-  if (resolved.example !== undefined) return resolved.example
+  // Example present — randomize intelligently instead of returning verbatim
+  if (resolved.example !== undefined) {
+    return randomizeFromExample(resolved, fieldName)
+  }
 
-  // Enum — pick first value
-  if (resolved.enum && resolved.enum.length > 0) return resolved.enum[0]
+  // Enum — pick random value
+  if (resolved.enum && resolved.enum.length > 0) {
+    return resolved.enum[Math.floor(Math.random() * resolved.enum.length)]
+  }
 
   const type = resolved.type
 
@@ -35,15 +116,15 @@ function generateValue(
   if (type === "string") {
     if (resolved.format === "uuid") {
       const s = nanoid(32)
-      return `${s.slice(0,8)}-${s.slice(8,12)}-${s.slice(12,16)}-${s.slice(16,20)}-${s.slice(20)}`
+      return `${s.slice(0, 8)}-${s.slice(8, 12)}-${s.slice(12, 16)}-${s.slice(16, 20)}-${s.slice(20)}`
     }
-    if (resolved.format === "email") return "user@example.com"
+    if (resolved.format === "email") return `user_${nanoid(5)}@example.com`
     if (resolved.format === "date-time") return new Date().toISOString()
     if (resolved.format === "date") return new Date().toISOString().split("T")[0]
     if (resolved.format === "uri") return "https://example.com"
 
     const name = fieldName.toLowerCase()
-    if (name.includes("email")) return "user@example.com"
+    if (name.includes("email")) return `user_${nanoid(5)}@example.com`
     if (name.includes("name")) return "Sample Name"
     if (name.includes("title")) return "Sample Title"
     if (name.includes("description")) return "Sample description"
@@ -59,22 +140,22 @@ function generateValue(
     if (name.includes("token")) return "sample-token-" + nanoid(8)
     if (name.includes("key")) return "sample-key-" + nanoid(8)
 
-    return fieldName ? fieldName + "-value" : "sample"
+    return fieldName ? fieldName + "-" + nanoid(6) : "sample-" + nanoid(6)
   }
 
   // Number / integer
   if (type === "number" || type === "integer") {
     const min = typeof resolved.minimum === "number" ? resolved.minimum : 0
     const max = typeof resolved.maximum === "number" ? resolved.maximum : 100
-    const value = Math.floor(Math.random() * (max - min + 1)) + min
+    const value = Math.random() * (max - min) + min
     if (type === "integer") return Math.floor(value)
     return Math.round(value * 100) / 100
   }
 
   // Boolean
-  if (type === "boolean") return true
+  if (type === "boolean") return Math.random() > 0.5
 
-  // Array
+  // Array — generate 2 items
   if (type === "array") {
     const items = (resolved as OpenAPIV3.ArraySchemaObject).items
     if (!items) return []

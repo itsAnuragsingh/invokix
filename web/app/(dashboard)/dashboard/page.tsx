@@ -4,78 +4,131 @@ import { redirect } from "next/navigation"
 import { getProjectsByUserId } from "@/lib/db/queries/projects"
 import { ProjectCard } from "@/components/dashboard/ProjectCard"
 import { CreateProjectDialog } from "@/components/dashboard/CreateProjectDialog"
-import { PlusIcon, LightningIcon, ArrowRightIcon } from "@phosphor-icons/react/dist/ssr"
+import { LightningIcon } from "@phosphor-icons/react/dist/ssr"
+import { getUserPlan, countMonthlyAiGenerations, checkContractLimit } from "@/lib/plans/usage"
+import { PLAN_LIMITS, PLAN_DISPLAY } from "@/lib/plans/limits"
 
 export default async function DashboardPage() {
   const session = await requireSession()
   if (!session) redirect("/login")
 
-  const projects = await getProjectsByUserId(session.user.id)
+  const [projects, plan, aiUsed, contractLimit] = await Promise.all([
+    getProjectsByUserId(session.user.id),
+    getUserPlan(session.user.id),
+    countMonthlyAiGenerations(session.user.id),
+    checkContractLimit(session.user.id),
+  ])
+
+  const limits = PLAN_LIMITS[plan]
+  const planDisplay = PLAN_DISPLAY[plan]
+  const firstName = session.user.name?.split(" ")[0] ?? "there"
+  const aiMax = limits.maxAiGenerationsPerMonth
+  const aiPercent = aiMax === Infinity ? 0 : Math.min((aiUsed / aiMax) * 100, 100)
 
   return (
-    <div className="space-y-8 animate-fade-up">
+    <div className="space-y-10 animate-fade-up">
 
-      {/* Header */}
-      <div className="flex items-start justify-between">
+      {/* ── Header ──────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">
-            Welcome back
-          </p>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">
-            {session.user.name}
+          <div className="flex items-center gap-2.5 mb-2">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-primary/70">
+              Welcome back
+            </p>
+            <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
+              {planDisplay.badge}
+            </span>
+          </div>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-none">
+            {firstName}
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
+          <p className="text-muted-foreground mt-2 text-sm">
             {projects.length === 0
-              ? "Create your first project to get started"
+              ? "Create your first API contract to get started."
               : `${projects.length} project${projects.length !== 1 ? "s" : ""} · All systems operational`}
           </p>
         </div>
         <CreateProjectDialog />
       </div>
 
-      {/* Stats bar */}
+      {/* ── Stat cards ──────────────────────────────────────────────── */}
       {projects.length > 0 && (
-        <div className="grid grid-cols-3 gap-3 animate-fade-up animate-fade-up-delay-1">
-          {[
-            { label: "Total Projects", value: projects.length },
-            { label: "Active Contracts", value: projects.length },
-            { label: "Health Score", value: "—" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-xl border border-border/50 bg-card/50 px-4 py-3 backdrop-blur-sm"
-            >
-              <p className="text-2xl font-display font-bold text-foreground">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
-            </div>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Projects / Contract Limit */}
+          <div className="group relative rounded-2xl border border-border/40 bg-card/40 px-5 py-4 overflow-hidden transition-all duration-200 hover:border-border/70 hover:bg-card/60">
+            <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            <p className="font-display text-3xl font-bold text-foreground">
+              {contractLimit.current}
+              {contractLimit.limit !== Infinity && (
+                <span className="text-lg text-muted-foreground font-normal">/{contractLimit.limit}</span>
+              )}
+            </p>
+            <p className="text-xs font-semibold text-foreground/70 mt-1">Contracts</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {contractLimit.limit === Infinity
+                ? "Unlimited on your plan"
+                : contractLimit.allowed
+                  ? `${contractLimit.limit - contractLimit.current} remaining`
+                  : "Limit reached — upgrade to add more"}
+            </p>
+          </div>
+
+          {/* AI Generations */}
+          <div className="group relative rounded-2xl border border-border/40 bg-card/40 px-5 py-4 overflow-hidden transition-all duration-200 hover:border-border/70 hover:bg-card/60">
+            <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            <p className="font-display text-3xl font-bold text-foreground">
+              {aiUsed}
+              {aiMax !== Infinity && (
+                <span className="text-lg text-muted-foreground font-normal">/{aiMax}</span>
+              )}
+            </p>
+            <p className="text-xs font-semibold text-foreground/70 mt-1">AI Generations</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">This month</p>
+            {aiMax !== Infinity && (
+              <div className="mt-2 h-1 w-full rounded-full bg-border/50 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    aiPercent >= 90 ? "bg-red-500" : aiPercent >= 70 ? "bg-amber-500" : "bg-primary"
+                  }`}
+                  style={{ width: `${aiPercent}%` }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Health Score */}
+          <div className="group relative rounded-2xl border border-border/40 bg-card/40 px-5 py-4 overflow-hidden transition-all duration-200 hover:border-border/70 hover:bg-card/60">
+            <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            <p className="font-display text-3xl font-bold text-foreground">—</p>
+            <p className="text-xs font-semibold text-foreground/70 mt-1">Avg Health Score</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Publish a contract to track</p>
+          </div>
         </div>
       )}
 
-      {/* Projects */}
+      {/* ── Projects ────────────────────────────────────────────────── */}
       {projects.length === 0 ? (
-        <div className="animate-fade-up animate-fade-up-delay-2">
-          <div className="relative rounded-2xl border border-dashed border-border/50 bg-card/30 p-16 text-center overflow-hidden">
-            <div className="absolute inset-0 bg-grid opacity-30" />
-            <div className="relative">
-              <div className="mx-auto mb-4 h-12 w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                <LightningIcon weight="fill" className="h-6 w-6 text-primary" />
-              </div>
-              <h2 className="font-display text-xl font-semibold text-foreground">No projects yet</h2>
-              <p className="text-muted-foreground text-sm mt-2 max-w-sm mx-auto">
-                Create your first project and generate TypeScript types, React Query hooks, and Zod schemas in seconds.
-              </p>
-              <div className="mt-6">
-                <CreateProjectDialog />
-              </div>
+        <div className="relative rounded-2xl border border-dashed border-border/50 bg-card/20 p-20 text-center overflow-hidden">
+          <div className="absolute inset-0 bg-grid opacity-20" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+          <div className="relative flex flex-col items-center gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <LightningIcon weight="fill" className="h-7 w-7 text-primary" />
             </div>
+            <div>
+              <h2 className="font-display text-xl font-bold text-foreground">No projects yet</h2>
+              <p className="text-muted-foreground text-sm mt-1.5 max-w-xs mx-auto leading-relaxed">
+                Create your first project and generate TypeScript types, React Query hooks, and Zod schemas instantly.
+              </p>
+            </div>
+            <CreateProjectDialog />
           </div>
         </div>
       ) : (
-        <div className="space-y-3 animate-fade-up animate-fade-up-delay-2">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/60">
-              Projects
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground/50">
+              Projects · {projects.length}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -83,12 +136,18 @@ export default async function DashboardPage() {
               <div
                 key={project.id}
                 className="animate-fade-up"
-                style={{ animationDelay: `${i * 0.05}s`, opacity: 0, animationFillMode: "forwards" }}
+                style={{
+                  animationDelay: `${i * 0.05}s`,
+                  opacity: 0,
+                  animationFillMode: "forwards",
+                }}
               >
                 <ProjectCard
-  project={project}
-  memberRole={(project as { memberRole?: "owner" | "editor" | "viewer" }).memberRole}
-/>
+                  project={project}
+                  memberRole={
+                    (project as { memberRole?: "owner" | "editor" | "viewer" }).memberRole
+                  }
+                />
               </div>
             ))}
           </div>
