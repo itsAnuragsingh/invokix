@@ -20,17 +20,16 @@ export function Navbar() {
       initial={{ opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
           ? "bg-[#080A0F]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/20"
           : "bg-transparent"
-      }`}
+        }`}
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="h-12 w-12 overflow-hidden  rounded-full  flex items-center justify-center group-hover:bg-indigo-500/30 transition-colors">
-            <img src="/logo.png" className=" h-full  object-cover" alt="invokix"/>
+            <img src="/logo.png" className=" h-full  object-cover" alt="invokix" />
           </div>
           <span className="font-display font-bold text-white tracking-tight text-xl">
             Invokix
@@ -42,7 +41,7 @@ export function Navbar() {
           {["Features", "Pricing", "Docs"].map((item) => (
             <Link
               key={item}
-              href={item === "Docs" ? "/docs":`#${item.toLowerCase()}`}
+              href={item === "Docs" ? "/docs" : `#${item.toLowerCase()}`}
               className="text-sm text-zinc-400 hover:text-white transition-colors"
             >
               {item}

@@ -25,6 +25,10 @@ import {
 } from "@phosphor-icons/react/dist/ssr"
 import { ProblemStory } from "@/components/landing/ProblemStory"
 import { AIGeneratorDemo } from "@/components/landing/AIGeneratorDemo"
+import { WatchDemoButton } from "@/components/landing/WatchDemoButton"
+import { Footer } from "@/components/landing/Footer"
+import { ScrollProgress } from "@/components/landing/ScrollProgress"
+import { FAQ } from "@/components/landing/FAQ"
 
 
 // ── Feature visuals ──────────────────────────────────────────────────────────
@@ -176,6 +180,8 @@ const PRICING_PLANS = [
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#080A0F] text-white overflow-x-hidden">
+      <ScrollProgress />
+    
       <Navbar />
 
       {/* ── Hero ── */}
@@ -228,11 +234,7 @@ export default function LandingPage() {
                   <ArrowRightIcon size={16} className="ml-2" />
                 </Button>
               </Link>
-              <Link href="#features">
-                <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 h-11 text-sm">
-                  See how it works →
-                </Button>
-              </Link>
+              <WatchDemoButton />
             </div>
 
             <div className="flex flex-wrap items-center gap-3 sm:gap-6 pt-2">
@@ -313,6 +315,7 @@ export default function LandingPage() {
     <section id="features" className="py-20 sm:py-28 border-t border-white/5 space-y-20 sm:space-y-28">
         <AIGeneratorDemo/>
         <CodegenShowcase />
+       
         <BreakingChangeDemo />
         <HealthScoreDemo />
         <SlackAlertDemo />
@@ -376,6 +379,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── FAQ ── */}
+      <FAQ />
+
       {/* ── Final CTA ── */}
       <section className="relative py-28 sm:py-36 border-t border-white/5 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -406,25 +412,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-white/5 py-8 sm:py-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="h-7 w-7 rounded-lg bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center">
-              <RobotIcon weight="fill" size={15} className="text-indigo-400" />
-            </div>
-            <span className="font-display font-bold text-sm text-white">Invokix</span>
-            <span className="text-zinc-600 text-xs ml-2">© 2025</span>
-          </div>
-          <div className="flex items-center gap-6">
-            {["Twitter", "GitHub", "Email"].map((item) => (
-              <Link key={item} href="#" className="text-xs text-zinc-500 hover:text-white transition-colors">
-                {item}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
