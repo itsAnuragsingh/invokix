@@ -1,7 +1,7 @@
 // lib/db/queries/cli.ts
 import { db } from "@/lib/db"
 import { cliTokens, cliSessions } from "@/lib/db/schema"
-import { eq, and, gt } from "drizzle-orm"
+import { eq, and, gt, lt } from "drizzle-orm"
 import { nanoid } from "nanoid"
 
 // ── Token format ──────────────────────────────────────────────────────────────
@@ -132,5 +132,5 @@ export async function deleteCliSession(id: string) {
 export async function cleanExpiredCliSessions() {
   await db
     .delete(cliSessions)
-    .where(gt(new Date(), cliSessions.expiresAt))
+    .where(lt(cliSessions.expiresAt, new Date()))
 }

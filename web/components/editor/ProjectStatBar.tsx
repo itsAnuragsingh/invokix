@@ -71,9 +71,9 @@ export function ProjectStatBar({
   projectId,
   contractId,
 }: ProjectStatBarProps) {
-  const [copied, setCopied]           = useState(false)
+  const [copied, setCopied] = useState(false)
   const [healthScore, setHealthScore] = useState(initialHealthScore)
-  const [refreshing, setRefreshing]   = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
   const config = healthConfig(healthScore)
 
   function handleCopy() {
@@ -103,11 +103,11 @@ export function ProjectStatBar({
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 lg:grid-cols-5 gap-px bg-border/45">
 
       {/* Health Score */}
       <div className={cn(
-        "group flex items-center gap-3 rounded-xl border p-3.5 transition-all duration-150 relative",
+        "group flex items-center gap-3 bg-background p-4 transition-all duration-150 relative",
         config.bg, config.border
       )}>
         <MiniHealthRing score={healthScore} config={config} />
@@ -137,7 +137,7 @@ export function ProjectStatBar({
       </div>
 
       {/* Endpoints */}
-      <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/30 p-3.5 hover:bg-card/60 transition-all duration-150">
+      <div className="flex items-center gap-3 bg-background p-4 hover:bg-card/60 transition-all duration-150">
         <div className="h-9 w-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
           <LightningIcon size={16} weight="duotone" className="text-primary" />
         </div>
@@ -148,7 +148,7 @@ export function ProjectStatBar({
       </div>
 
       {/* Version */}
-      <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/30 p-3.5 hover:bg-card/60 transition-all duration-150">
+      <div className="flex items-center gap-3 bg-background p-4 hover:bg-card/60 transition-all duration-150">
         <div className="h-9 w-9 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
           <TagIcon size={16} weight="duotone" className="text-violet-400" />
         </div>
@@ -159,7 +159,7 @@ export function ProjectStatBar({
       </div>
 
       {/* Last Updated */}
-      <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/30 p-3.5 hover:bg-card/60 transition-all duration-150">
+      <div className="flex items-center gap-3 bg-background p-4 hover:bg-card/60 transition-all duration-150">
         <div className="h-9 w-9 rounded-lg bg-zinc-500/10 border border-zinc-500/20 flex items-center justify-center shrink-0">
           <ClockIcon size={16} weight="duotone" className="text-zinc-400" />
         </div>
@@ -170,7 +170,7 @@ export function ProjectStatBar({
       </div>
 
       {/* Mock Server */}
-      <div className="col-span-2 lg:col-span-1 flex items-center gap-3 rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3.5 hover:bg-emerald-500/10 transition-all duration-150 group">
+      <div className="col-span-2 lg:col-span-1 flex items-center gap-3 bg-emerald-500/5 p-4 hover:bg-emerald-500/10 transition-all duration-150 group">
         <div className="relative shrink-0">
           <div className="h-9 w-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
             <div className="h-2.5 w-2.5 rounded-full bg-emerald-400" />

@@ -82,11 +82,11 @@ export function PublishButton({ projectId }: PublishButtonProps) {
         onClick={() => handlePublish(false)}
         disabled={loading}
         size="sm"
-        className="h-8 text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 px-4 gap-1.5"
+        className="group h-9 px-4 text-xs font-bold bg-[#B7FF3C] hover:bg-[#a5e82f] text-[#10100B] border border-[#B7FF3C]/80 shadow-[3px_3px_0_rgba(0,0,0,0.9)] hover:shadow-[5px_5px_0_rgba(183,255,60,0.4)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-all duration-150 rounded-lg flex items-center gap-2"
       >
         {loading ? (
           <motion.div
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1.5 font-mono"
             animate={{ opacity: [1, 0.5, 1] }}
             transition={{ duration: 1, repeat: Infinity }}
           >
@@ -95,9 +95,9 @@ export function PublishButton({ projectId }: PublishButtonProps) {
           </motion.div>
         ) : (
           <>
-            <RocketLaunchIcon weight="fill" className="h-3.5 w-3.5" />
-            Publish
-            <ArrowRightIcon className="h-3.5 w-3.5" />
+            <RocketLaunchIcon weight="fill" className="h-4 w-4 text-[#10100B]" />
+            <span>Publish Release</span>
+            <ArrowRightIcon className="h-3.5 w-3.5 text-[#10100B] group-hover:translate-x-0.5 transition-transform" />
           </>
         )}
       </Button>

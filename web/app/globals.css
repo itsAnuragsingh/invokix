@@ -107,18 +107,40 @@
 /* Mobile: no sidebar offset */
 #dashboard-main {
   margin-left: 0;
-  transition: margin-left 0.3s ease;
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  transition: margin-left 0.3s ease, width 0.3s ease;
 }
 /* Desktop: sidebar offsets content */
 @media (min-width: 768px) {
   #dashboard-main {
     margin-left: 256px;
+    width: calc(100% - 256px);
   }
   body[data-sidebar="collapsed"] #dashboard-main {
-    margin-left: 60px;
+    margin-left: 68px;
+    width: calc(100% - 68px);
   }
   body[data-sidebar="expanded"] #dashboard-main {
     margin-left: 256px;
+    width: calc(100% - 256px);
+  }
+
+  /* A single compact radius scale keeps the product UI deliberate. */
+  #dashboard-main .rounded-2xl { border-radius: 0.5rem; }
+  #dashboard-main .rounded-xl { border-radius: 0.375rem; }
+  #dashboard-main .rounded-lg { border-radius: 0.25rem; }
+
+  #dashboard-main button:not([data-slot="switch"]),
+  #dashboard-main [role="button"] {
+    border-radius: 0.25rem;
+  }
+
+  #dashboard-main input,
+  #dashboard-main textarea,
+  #dashboard-main select {
+    border-radius: 0.25rem;
   }
 }
 

@@ -5,14 +5,6 @@ import { getProjectById } from "@/lib/db/queries/projects"
 import { getContractByProjectId } from "@/lib/db/queries/contracts"
 import { getVersionsByContractId } from "@/lib/db/queries/versions"
 import { HistoryTimeline } from "@/components/editor/HistoryTimeline"
-import { Badge } from "@/components/ui/badge"
-import {
-  GitBranchIcon,
-  LightningIcon,
-  UsersIcon,
-  GearIcon,
-  ShareNetworkIcon,
-} from "@phosphor-icons/react/dist/ssr"
 import Link from "next/link"
 import { getUserPlan } from "@/lib/plans/usage"
 import { PLAN_LIMITS } from "@/lib/plans/limits"
@@ -44,10 +36,10 @@ export default async function HistoryPage({ params }: Props) {
   const hiddenCount = allVersions.length - visibleVersions.length
 
   return (
-    <div className="space-y-0 animate-fade-up">
+    <div className="mx-auto max-w-7xl animate-fade-up">
 
       {/* Header */}
-      <div className="flex items-start justify-between pb-5">
+      <div className="border-b border-border/45 pb-7">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Link href="/dashboard" className="text-xs text-muted-foreground hover:text-foreground transition-colors">Projects</Link>
@@ -56,17 +48,7 @@ export default async function HistoryPage({ params }: Props) {
             <span className="text-muted-foreground/40 text-xs">›</span>
             <span className="text-xs text-foreground font-medium">History</span>
           </div>
-          <div className="flex items-center gap-3">
-            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">Version History</h1>
-            <Badge variant="outline" className="font-mono text-xs border-primary/30 text-primary bg-primary/5">
-              {allVersions.length} versions
-            </Badge>
-            {visibleLimit !== Infinity && (
-              <Badge variant="outline" className="font-mono text-xs border-amber-500/30 text-amber-500 bg-amber-500/5">
-                Showing last {visibleLimit}
-              </Badge>
-            )}
-          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-3"><h1 className="font-display text-4xl font-bold tracking-tight text-foreground">Version history.</h1><span className="border border-primary/30 bg-primary/5 px-2 py-1 font-mono text-[10px] text-primary">{allVersions.length} versions</span>{visibleLimit !== Infinity && <span className="border border-amber-500/30 bg-amber-500/5 px-2 py-1 font-mono text-[10px] text-amber-500">Last {visibleLimit} visible</span>}</div>
           <p className="text-muted-foreground text-sm mt-1">
             {limits.canRollback
               ? "Every publish snapshot — diff, rollback, full audit trail"
@@ -75,36 +57,11 @@ export default async function HistoryPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Nav tabs */}
-      <div className="flex items-center gap-1 border-b border-border/50 mb-8">
-        {[
-          { href: `/project/${id}`, label: "Contract", icon: LightningIcon },
-          { href: `/project/${id}/history`, label: "History", icon: GitBranchIcon, active: true },
-          { href: `/project/${id}/consumers`, label: "Consumers", icon: UsersIcon },
-          { href: `/project/${id}/settings`, label: "Settings", icon: GearIcon },
-          { href: `/share/${contract.id}`, label: "Share ↗", icon: ShareNetworkIcon, external: true },
-        ].map(({ href, label, icon: Icon, active, external }) => (
-          <Link
-            key={href}
-            href={href}
-            target={external ? "_blank" : undefined}
-            className={`flex items-center gap-1.5 px-3 py-2.5 text-sm border-b-2 transition-all duration-150 -mb-px ${
-              active
-                ? "text-foreground border-primary"
-                : "text-muted-foreground border-transparent hover:text-foreground hover:border-primary/50"
-            }`}
-          >
-            <Icon className="h-3.5 w-3.5" />
-            {label}
-          </Link>
-        ))}
-      </div>
-
-      <HistoryTimeline
+      <div className="mt-8"><HistoryTimeline
         versions={visibleVersions}
         contractId={contract.id}
         projectId={id}
-      />
+      /></div>
 
       {/* Upgrade banner when older versions are hidden */}
       {hiddenCount > 0 && (

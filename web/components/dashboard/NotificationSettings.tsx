@@ -67,14 +67,14 @@ export function NotificationSettings({ projectId, initial }: NotificationSetting
       </div>
 
       {/* Slack */}
-      <div className="rounded-xl border border-border/50 bg-card/50 overflow-hidden">
+      <div className="border border-border/60 bg-card/50 overflow-hidden shadow-[2px_2px_0_rgba(0,0,0,0.6)]">
         <div className="px-4 py-3 border-b border-border/40 bg-muted/20 flex items-center gap-2">
           <div className="h-6 w-6 rounded-md bg-[#4A154B]/20 border border-[#4A154B]/30 flex items-center justify-center">
             <SlackLogoIcon weight="fill" className="h-3.5 w-3.5 text-[#E01E5A]" />
           </div>
           <span className="text-xs font-semibold text-foreground">Slack</span>
           {slackUrl && (
-            <Badge variant="outline" className="ml-auto text-[10px] border-emerald-500/20 text-emerald-400 bg-emerald-500/5">
+            <Badge variant="outline" className="ml-auto text-[10px] font-mono border-[#B7FF3C]/30 text-[#B7FF3C] bg-[#B7FF3C]/10">
               Connected
             </Badge>
           )}
@@ -98,14 +98,14 @@ export function NotificationSettings({ projectId, initial }: NotificationSetting
       </div>
 
       {/* Discord */}
-      <div className="rounded-xl border border-border/50 bg-card/50 overflow-hidden">
+      <div className="border border-border/60 bg-card/50 overflow-hidden shadow-[2px_2px_0_rgba(0,0,0,0.6)]">
         <div className="px-4 py-3 border-b border-border/40 bg-muted/20 flex items-center gap-2">
           <div className="h-6 w-6 rounded-md bg-[#5865F2]/20 border border-[#5865F2]/30 flex items-center justify-center">
             <span className="text-[10px] font-bold text-[#5865F2]">D</span>
           </div>
           <span className="text-xs font-semibold text-foreground">Discord</span>
           {discordUrl && (
-            <Badge variant="outline" className="ml-auto text-[10px] border-emerald-500/20 text-emerald-400 bg-emerald-500/5">
+            <Badge variant="outline" className="ml-auto text-[10px] font-mono border-[#B7FF3C]/30 text-[#B7FF3C] bg-[#B7FF3C]/10">
               Connected
             </Badge>
           )}
@@ -126,7 +126,7 @@ export function NotificationSettings({ projectId, initial }: NotificationSetting
       </div>
 
       {/* Alert triggers */}
-      <div className="rounded-xl border border-border/50 bg-card/50 overflow-hidden">
+      <div className="border border-border/60 bg-card/50 overflow-hidden shadow-[2px_2px_0_rgba(0,0,0,0.6)]">
         <div className="px-4 py-3 border-b border-border/40 bg-muted/20">
           <span className="text-xs font-semibold text-foreground">Alert triggers</span>
         </div>
@@ -139,7 +139,7 @@ export function NotificationSettings({ projectId, initial }: NotificationSetting
               value: alertOnBreaking,
               set: setAlertOnBreaking,
               icon: WarningIcon,
-              color: "text-amber-400",
+              color: "text-[#F15A3C]",
             },
             {
               key: "any",
@@ -148,19 +148,19 @@ export function NotificationSettings({ projectId, initial }: NotificationSetting
               value: alertOnAny,
               set: setAlertOnAny,
               icon: BellIcon,
-              color: "text-primary",
+              color: "text-[#B7FF3C]",
             },
           ].map(({ key, label, desc, value, set, icon: Icon, color }) => (
             <label
               key={key}
               className={cn(
-                "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
-                value ? "border-primary/20 bg-primary/5" : "border-border/40 bg-muted/20 hover:border-border/60"
+                "flex items-start gap-3 p-3 border cursor-pointer transition-colors",
+                value ? "border-[#B7FF3C]/30 bg-[#B7FF3C]/5" : "border-border/40 bg-muted/20 hover:border-border/60"
               )}
             >
               <div className={cn(
-                "h-8 w-8 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 transition-colors",
-                value ? "bg-primary/10 border-primary/20" : "bg-muted/40 border-border/40"
+                "h-8 w-8 border flex items-center justify-center shrink-0 mt-0.5 transition-colors",
+                value ? "bg-[#B7FF3C]/10 border-[#B7FF3C]/30" : "bg-muted/40 border-border/40"
               )}>
                 <Icon weight="fill" className={cn("h-4 w-4", value ? color : "text-muted-foreground/40")} />
               </div>
@@ -170,11 +170,11 @@ export function NotificationSettings({ projectId, initial }: NotificationSetting
               </div>
               <div className={cn(
                 "h-5 w-9 rounded-full border-2 transition-colors relative shrink-0 mt-1",
-                value ? "bg-primary border-primary" : "bg-muted border-border/50"
+                value ? "bg-[#B7FF3C] border-[#B7FF3C]" : "bg-muted border-border/50"
               )}>
                 <div className={cn(
-                  "absolute top-0.5 h-3 w-3 rounded-full bg-white transition-transform shadow-sm",
-                  value ? "translate-x-4" : "translate-x-0.5"
+                  "absolute top-0.5 h-3 w-3 rounded-full bg-[#10100B] transition-transform shadow-sm",
+                  value ? "translate-x-4" : "translate-x-0.5 bg-white"
                 )} />
               </div>
               <input
@@ -193,10 +193,10 @@ export function NotificationSettings({ projectId, initial }: NotificationSetting
         onClick={handleSave}
         disabled={loading}
         className={cn(
-          "w-full h-10 font-medium shadow-lg transition-all",
+          "w-full h-10 font-bold text-xs uppercase tracking-wide shadow-lg transition-all",
           saved
             ? "bg-emerald-500 hover:bg-emerald-500 text-white shadow-emerald-500/20"
-            : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary/20"
+            : "bg-foreground text-background hover:bg-foreground/90 shadow-[2px_2px_0_rgba(183,255,60,0.8)]"
         )}
       >
         {loading ? (

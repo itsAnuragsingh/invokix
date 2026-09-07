@@ -109,10 +109,10 @@ export function EditSpecModal({
         <Button
           variant="outline"
           size="sm"
-          className="border-border/50 text-muted-foreground hover:text-foreground hover:border-border gap-1.5 h-8 text-xs"
+          className="group h-9 px-3.5 text-xs font-semibold bg-white/[0.04] text-muted-foreground hover:text-foreground border border-border/60 hover:border-border/90 hover:bg-white/[0.08] shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-all duration-150 rounded-lg flex items-center gap-1.5"
         >
-          <PencilSimpleIcon className="h-3.5 w-3.5" />
-          Edit Spec
+          <PencilSimpleIcon className="h-3.5 w-3.5 text-primary/80 group-hover:text-primary transition-colors" />
+          <span>Edit Spec</span>
         </Button>
       </DialogTrigger>
 

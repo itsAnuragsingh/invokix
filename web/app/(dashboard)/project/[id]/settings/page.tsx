@@ -8,10 +8,6 @@ import { getTeamMembers, getPendingInvites } from "@/lib/db/queries/team"
 import { NotificationSettings } from "@/components/dashboard/NotificationSettings"
 import { DangerZone } from "@/components/dashboard/DangerZone"
 import { TeamManager } from "@/components/dashboard/TeamManager"
-import {
-  LightningIcon, GitBranchIcon, UsersIcon,
-  GearIcon, ShareNetworkIcon,
-} from "@phosphor-icons/react/dist/ssr"
 import Link from "next/link"
 import { StackSelector } from "@/components/dashboard/StackSelector"
 import { getUserPlan } from "@/lib/plans/usage"
@@ -47,8 +43,8 @@ export default async function SettingsPage({ params }: Props) {
   const teamLimitReached = teamMax !== Infinity && teamCount >= teamMax
 
   return (
-    <div className="space-y-0 animate-fade-up">
-      <div className="flex items-start justify-between pb-5">
+    <div className="mx-auto max-w-7xl animate-fade-up">
+      <div className="border-b border-border/45 pb-7">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Link href="/dashboard" className="text-xs text-muted-foreground hover:text-foreground transition-colors">Projects</Link>
@@ -57,9 +53,9 @@ export default async function SettingsPage({ params }: Props) {
             <span className="text-muted-foreground/40 text-xs">›</span>
             <span className="text-xs text-foreground font-medium">Settings</span>
           </div>
-          <div className="flex items-center gap-3">
-            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">Settings</h1>
-            <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
+          <div className="mt-4 flex items-center gap-3">
+            <h1 className="font-display text-4xl font-bold tracking-tight text-foreground">Project settings.</h1>
+            <span className="inline-flex items-center border border-primary/30 bg-primary/5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary">
               {planDisplay.badge} plan
             </span>
           </div>
@@ -67,26 +63,7 @@ export default async function SettingsPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Nav */}
-      <div className="flex items-center gap-1 border-b border-border/50 mb-8">
-        {[
-          { href: `/project/${id}`, label: "Contract", icon: LightningIcon },
-          { href: `/project/${id}/history`, label: "History", icon: GitBranchIcon },
-          { href: `/project/${id}/consumers`, label: "Consumers", icon: UsersIcon },
-          { href: `/project/${id}/settings`, label: "Settings", icon: GearIcon, active: true },
-          { href: `/share/${contract?.id ?? ""}`, label: "Share ↗", icon: ShareNetworkIcon, external: true },
-        ].map(({ href, label, icon: Icon, active, external }) => (
-          <Link key={href} href={href} target={external ? "_blank" : undefined}
-            className={`flex items-center gap-1.5 px-3 py-2.5 text-sm border-b-2 transition-all duration-150 -mb-px ${
-              active ? "text-foreground border-primary" : "text-muted-foreground border-transparent hover:text-foreground hover:border-primary/50"
-            }`}
-          >
-            <Icon className="h-3.5 w-3.5" />{label}
-          </Link>
-        ))}
-      </div>
-
-      <div className="max-w-2xl space-y-8">
+      <div className="mt-8 max-w-3xl space-y-8">
         <StackSelector
           projectId={id}
           currentStack={project.stack as "nextjs" | "react-native" | "express" | "angular" | "other"}

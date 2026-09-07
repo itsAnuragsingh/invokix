@@ -633,7 +633,7 @@ export function InteractiveWorkbench() {
 
           {/* Footer stats bar */}
           <div className="px-6 py-3 border-t border-white/[0.05] bg-white/[0.01] flex items-center justify-between flex-wrap gap-2 text-[10px] text-zinc-500">
-            <span>Powered by Groq Llama 3 & Claude Sonnet integrations</span>
+            <span>Powered by Groq Qwen 3.8 & Claude Sonnet integrations</span>
             <span className="flex items-center gap-1.5 text-indigo-400/80">
               <CheckIcon size={12} weight="bold" />
               100% Type-Safe Workflows

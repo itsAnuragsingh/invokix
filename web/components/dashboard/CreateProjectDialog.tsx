@@ -107,9 +107,11 @@ export function CreateProjectDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          New Project
+        <Button className="group h-9 px-4 text-xs font-bold tracking-wide bg-foreground text-background hover:bg-foreground/95 border border-foreground/30 shadow-[3px_3px_0_rgba(183,255,60,0.9)] hover:shadow-[5px_5px_0_rgba(183,255,60,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-all duration-150 rounded-lg flex items-center gap-2">
+          <span className="grid h-4 w-4 place-items-center rounded bg-background/20 group-hover:rotate-90 transition-transform duration-200">
+            <Plus className="h-3 w-3 stroke-[3]" />
+          </span>
+          <span>New Project</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
@@ -155,30 +157,30 @@ export function CreateProjectDialog() {
                   onClick={() => setStack(option.value)}
                   className={`flex items-center gap-3 px-4 py-2.5 rounded-lg border text-left transition-all ${
                     stack === option.value
-                      ? "border-indigo-500 bg-indigo-500/10 text-foreground"
-                      : "border-border bg-card text-muted-foreground hover:border-border/80 hover:text-foreground"
+                      ? "border-[#B7FF3C] bg-[#B7FF3C]/10 text-foreground shadow-[2px_2px_0_rgba(183,255,60,0.3)]"
+                      : "border-border/60 bg-card/60 text-muted-foreground hover:border-border hover:text-foreground"
                   }`}
                 >
-                  <span className={stack === option.value ? "text-indigo-400" : "text-muted-foreground"}>
+                  <span className={stack === option.value ? "text-[#B7FF3C]" : "text-muted-foreground"}>
                     {option.icon}
                   </span>
                   <span className="flex-1">
                     <span className="block text-sm font-medium">{option.label}</span>
-                    <span className="block text-xs text-muted-foreground">{option.description}</span>
+                    <span className="block text-xs text-muted-foreground/70">{option.description}</span>
                   </span>
                   {stack === option.value && (
-                    <span className="w-2 h-2 rounded-full bg-indigo-400 shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#B7FF3C] shadow-[0_0_8px_#B7FF3C] shrink-0" />
                   )}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-1">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-border/60 text-xs">
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="bg-foreground text-background font-bold text-xs hover:bg-foreground/90 shadow-[2px_2px_0_rgba(183,255,60,0.9)]">
               {loading ? "Creating..." : "Create project"}
             </Button>
           </div>

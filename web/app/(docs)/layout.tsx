@@ -13,25 +13,25 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen bg-background text-foreground">
 
       {/* Top nav */}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/90 backdrop-blur-md">
         <div className="max-w-screen-xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 shrink-0">
-              <div className="h-6 w-6 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-white text-xs font-bold">⚡</span>
+            <Link href="/" className="flex items-center gap-2.5 shrink-0">
+              <div className="relative h-6 w-6 overflow-hidden rounded-md border border-white/15 shadow-sm">
+                <img src="/logo.png" alt="Invokix" className="h-full w-full object-cover" />
               </div>
-              <span className="font-display font-bold text-sm text-foreground">Invokix</span>
-              <span className="text-muted-foreground/40 text-sm">/</span>
-              <span className="text-sm text-muted-foreground">Docs</span>
+              <span className="font-display font-bold text-sm text-foreground">Invokix<span className="text-[#B7FF3C]">.</span></span>
+              <span className="text-muted-foreground/40 text-xs">/</span>
+              <span className="text-xs font-mono font-semibold text-[#B7FF3C]">Docs</span>
             </Link>
           </div>
 
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-xs font-bold text-foreground hover:text-[#B7FF3C] bg-white/[0.04] hover:bg-white/[0.08] px-3 py-1.5 border border-border/50 transition-all"
             >
-              Dashboard →
+              Console →
             </Link>
           </div>
         </div>

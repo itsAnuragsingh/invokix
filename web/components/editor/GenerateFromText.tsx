@@ -74,18 +74,23 @@ export function GenerateFromText({ projectId, hasExistingContract = false, trigg
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10">
-            <SparkleIcon className="h-3.5 w-3.5 mr-1.5" />
-            {isExtendMode ? "Extend with AI" : "Generate with AI"}
+          <Button
+            variant="outline"
+            size="sm"
+            className="group h-9 px-3.5 text-xs font-semibold bg-white/[0.04] text-foreground border border-border/70 hover:border-foreground/40 hover:bg-white/[0.08] shadow-[2px_2px_0_rgba(255,255,255,0.1)] hover:shadow-[3px_3px_0_rgba(255,255,255,0.25)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-all duration-150 rounded-lg flex items-center gap-2"
+          >
+            <span className="flex h-2 w-2 rounded-full bg-[#B7FF3C] animate-pulse shrink-0" />
+            <span>{isExtendMode ? "Extend Contract" : "Generate Contract"}</span>
+            <ArrowRightIcon className="h-3 w-3 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
           </Button>
         )}
       </DialogTrigger>
 
-      <DialogContent className="max-w-2xl bg-card border-border/50 p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-2xl w-full bg-card border-border/50 p-0 overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-border/40 bg-muted/20">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="h-8 w-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+          <div className="flex items-center gap-3 pr-6">
+            <div className="h-8 w-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
               <LightningIcon weight="fill" className="h-4 w-4 text-primary" />
             </div>
             <div>
@@ -108,9 +113,9 @@ export function GenerateFromText({ projectId, hasExistingContract = false, trigg
         </div>
 
         {/* Content */}
-        <div className="px-6 py-5">
-          <Tabs defaultValue="text">
-            <TabsList className="mb-4 bg-muted/40 border border-border/40">
+        <div className="p-6">
+          <Tabs defaultValue="text" className="w-full">
+            <TabsList className="mb-4 bg-muted/40 border border-border/40 p-1">
               <TabsTrigger value="text" className="gap-1.5 text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <SparkleIcon className="h-3.5 w-3.5" />
                 Plain English
@@ -122,12 +127,13 @@ export function GenerateFromText({ projectId, hasExistingContract = false, trigg
             </TabsList>
 
             <TabsContent value="text" className="space-y-3 mt-0">
-              <div className="relative">
+              {/* Textarea wrapper with inner card & clean inner padding */}
+              <div className="rounded-xl border border-border/50 bg-muted/20 p-3 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
                 <Textarea
                   placeholder={isExtendMode
                     ? "Describe the new endpoints to add..."
                     : "Describe your API in plain English..."}
-                  className="min-h-40 resize-none bg-muted/30 border-border/50 font-sans text-sm placeholder:text-muted-foreground/40 focus-visible:ring-primary/30"
+                  className="h-44 max-h-44 w-full overflow-y-auto resize-none bg-transparent border-0 font-sans text-sm leading-relaxed p-0 placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 [field-sizing:normal]"
                   value={plainEnglish}
                   onChange={(e) => setPlainEnglish(e.target.value)}
                 />
@@ -141,67 +147,46 @@ export function GenerateFromText({ projectId, hasExistingContract = false, trigg
                   Use example prompt →
                 </button>
               )}
-              <div className="flex items-center justify-between pt-1">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-[10px] border-primary/20 text-primary bg-primary/5">
-                    Groq Llama 4
-                  </Badge>
-                  <span className="text-[10px] text-muted-foreground">~3 seconds</span>
-                </div>
-                <Button
-                  onClick={() => handleGenerate("text")}
-                  disabled={loading}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 px-6"
-                >
-                  {loading ? (
-                    <>
-                      <SparkleIcon className="h-4 w-4 mr-2 animate-spin" />
-                      {isExtendMode ? "Extending..." : "Generating..."}
-                    </>
-                  ) : (
-                    <>
-                      {isExtendMode ? "Add Endpoints" : "Generate Contract"}
-                      <ArrowRightIcon className="h-4 w-4 ml-2" />
-                    </>
-                  )}
-                </Button>
-              </div>
             </TabsContent>
 
             <TabsContent value="code" className="space-y-3 mt-0">
-              <Textarea
-                placeholder="Paste your Express.js or Next.js route code here..."
-                className="min-h-40 resize-none bg-muted/30 border-border/50 font-mono text-xs placeholder:text-muted-foreground/40 focus-visible:ring-primary/30"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-              />
-              <div className="flex items-center justify-between pt-1">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-[10px] border-primary/20 text-primary bg-primary/5">
-                    Groq Llama 4
-                  </Badge>
-                  <span className="text-[10px] text-muted-foreground">~4 seconds</span>
-                </div>
-                <Button
-                  onClick={() => handleGenerate("code")}
-                  disabled={loading}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 px-6"
-                >
-                  {loading ? (
-                    <>
-                      <CodeIcon className="h-4 w-4 mr-2 animate-spin" />
-                      Extracting...
-                    </>
-                  ) : (
-                    <>
-                      Extract from Code
-                      <ArrowRightIcon className="h-4 w-4 ml-2" />
-                    </>
-                  )}
-                </Button>
+              <div className="rounded-xl border border-border/50 bg-muted/20 p-3 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+                <Textarea
+                  placeholder="Paste your Express.js or Next.js route code here..."
+                  className="h-44 max-h-44 w-full overflow-y-auto resize-none bg-transparent border-0 font-mono text-xs leading-relaxed p-0 placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 [field-sizing:normal]"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                />
               </div>
             </TabsContent>
           </Tabs>
+        </div>
+
+        {/* Footer action bar */}
+        <div className="px-6 py-4 border-t border-border/40 bg-muted/10 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 shrink-0">
+            <Badge variant="outline" className="text-[10px] border-primary/20 text-primary bg-primary/5">
+              Groq GPT-OSS 120B
+            </Badge>
+            <span className="text-[10px] text-muted-foreground">~3 seconds</span>
+          </div>
+          <Button
+            onClick={() => handleGenerate(code ? "code" : "text")}
+            disabled={loading}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 px-6 shrink-0"
+          >
+            {loading ? (
+              <>
+                <SparkleIcon className="h-4 w-4 mr-2 animate-spin" />
+                {isExtendMode ? "Extending..." : "Generating..."}
+              </>
+            ) : (
+              <>
+                {isExtendMode ? "Add Endpoints" : "Generate Contract"}
+                <ArrowRightIcon className="h-4 w-4 ml-2" />
+              </>
+            )}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

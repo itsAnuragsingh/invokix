@@ -1,5 +1,6 @@
 import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
 import { DocsFeatureGrid } from "@/components/docs/DocsFeatureGrid"
+import { DocsImageCard } from "@/components/docs/DocsImageCard"
 import Link from "next/link"
 
 export const metadata = {
@@ -23,6 +24,12 @@ The root cause is always the same: your API has no home. Changes happen in Slack
 ## What Invokix does
 
 Invokix gives your API a permanent home. One platform where your contract is always current, your code outputs are always in sync, and your team is always notified the moment anything changes.
+
+<DocsImageCard
+  src="/docs-architecture.png"
+  alt="Invokix API Contract Platform Architecture"
+  caption="Invokix Architecture Overview: Connecting OpenAPI Specs, Code Generators, Zod Validators, and Live Mock Server Pipelines."
+/>
 
 <DocsFeatureGrid />
 

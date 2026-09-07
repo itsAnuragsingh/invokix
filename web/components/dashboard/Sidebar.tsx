@@ -1,233 +1,390 @@
-// components/dashboard/Sidebar.tsx
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
-  HouseIcon,
-  GearIcon,
-  SignOutIcon,
-  CodeIcon,
-  LightningIcon,
-  ArrowSquareOutIcon,
-  StackIcon,
-  KeyIcon,
-  UserCircleIcon,
-  CaretRightIcon,
   ArrowLineLeftIcon,
   ArrowLineRightIcon,
+  BookOpenIcon,
+  CaretDownIcon,
+  CheckIcon,
+  CpuIcon,
+  GearIcon,
+  GitBranchIcon,
+  GlobeIcon,
+  HouseIcon,
+  KeyIcon,
+  LightningIcon,
   ListIcon,
+  ShieldCheckIcon,
+  SignOutIcon,
+  StackIcon,
+  UserCircleIcon,
+  UsersIcon,
   XIcon,
 } from "@phosphor-icons/react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { signOut } from "@/lib/auth/client"
 import type { User } from "better-auth"
 
-type SidebarProps = { user: User }
+type SidebarProps = { user: User; projects: { id: string; name: string }[] }
 
-const mainNav    = [{ href: "/dashboard",        label: "Dashboard", icon: HouseIcon }]
-const settingsNav = [
-  { href: "/settings/account",  label: "Account",  icon: UserCircleIcon },
-  { href: "/settings/api-keys", label: "API Keys", icon: KeyIcon },
+const primary = [{ href: "/dashboard", label: "Overview", icon: HouseIcon }]
+
+const resources = [
+  {
+    href: "/docs",
+    label: "Docs",
+    fullLabel: "Documentation",
+    icon: BookOpenIcon,
+    accentColor: "#AE8CFF", // Electric Lavender
+    badge: "v1.2",
+    hoverRotate: "group-hover:rotate-6",
+  },
+  {
+    href: "/templates",
+    label: "Templates",
+    fullLabel: "Templates",
+    icon: StackIcon,
+    accentColor: "#FFD15C", // Golden Amber
+    badge: "Specs",
+    hoverRotate: "group-hover:-rotate-6",
+  },
 ]
-const resourcesNav = [
-  { href: "/docs", label: "Documentation", icon: CodeIcon,   external: true },
-  { href: "#", label: "Templates",     icon: StackIcon,  external: true },
+
+const settings = [
+  { href: "/settings/account", label: "Account", icon: UserCircleIcon },
+  { href: "/settings/api-keys", label: "API keys", icon: KeyIcon },
 ]
 
-export function Sidebar({ user }: SidebarProps) {
-  const pathname  = usePathname()
-  const router    = useRouter()
-  const [collapsed,    setCollapsed]    = useState(false)
-  const [mobileOpen,   setMobileOpen]   = useState(false)
-  const [settingsOpen, setSettingsOpen] = useState(pathname.startsWith("/settings"))
+export function Sidebar({ user, projects }: SidebarProps) {
+  const pathname = usePathname()
+  const router = useRouter()
+  const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [projectMenuOpen, setProjectMenuOpen] = useState(false)
+  const active = (href: string, exact = false) =>
+    exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`)
 
-  useEffect(() => { setMobileOpen(false) }, [pathname])
+  const projectMatch = pathname.match(/^\/project\/([^/]+)/)
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
+  const projectId = projectMatch?.[1] ?? selectedProjectId
+  const projectTools = projectId
+    ? [
+        { href: `/project/${projectId}`, label: "Contract", icon: LightningIcon, exact: true },
+        { href: `/project/${projectId}/history`, label: "History", icon: GitBranchIcon },
+        { href: `/project/${projectId}/consumers`, label: "Consumers", icon: UsersIcon },
+        { href: `/project/${projectId}/mock`, label: "Mock server", icon: CpuIcon },
+        { href: `/project/${projectId}/environments`, label: "Environments", icon: GlobeIcon },
+        { href: `/project/${projectId}/validator`, label: "Validator", icon: ShieldCheckIcon },
+        { href: `/project/${projectId}/settings`, label: "Project settings", icon: GearIcon },
+      ]
+    : []
 
   useEffect(() => {
     document.body.dataset.sidebar = collapsed ? "collapsed" : "expanded"
   }, [collapsed])
 
   useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (projectMatch?.[1]) {
+      setSelectedProjectId(projectMatch[1])
+      localStorage.setItem("invokix:active-project", projectMatch[1])
+      return
+    }
+    const saved = localStorage.getItem("invokix:active-project")
+    if (saved && projects.some((project) => project.id === saved)) setSelectedProjectId(saved)
+    else if (projects[0]) setSelectedProjectId(projects[0].id)
+  }, [pathname, projects])
+
+  useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : ""
-    return () => { document.body.style.overflow = "" }
+    return () => {
+      document.body.style.overflow = ""
+    }
   }, [mobileOpen])
 
-  async function handleSignOut() {
-    await signOut()
-    router.push("/login")
-  }
+  const Nav = ({ mobile = false }: { mobile?: boolean }) => {
+    const expanded = mobile || !collapsed
+    const selectedProject = projects.find((project) => project.id === projectId)
+    const chooseProject = (id: string) => {
+      setSelectedProjectId(id)
+      localStorage.setItem("invokix:active-project", id)
+      setProjectMenuOpen(false)
+      router.push(`/project/${id}`)
+    }
 
-  const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(href + "/")
-
-  /** Shared nav tree — rendered in both desktop sidebar and mobile drawer */
-  function NavTree({ isMobile = false }: { isMobile?: boolean }) {
-    const isExpanded = isMobile || !collapsed
-    return (
-      <>
-        {/* Logo row */}
-        <div className={cn("flex items-center gap-3 px-4 pt-5 pb-4", !isExpanded && "px-[14px]")}>
-          <Link href="/dashboard" className="flex items-center gap-3 group min-w-0">
-            <div className="relative h-10 w-10 rounded-xl flex items-center justify-center overflow-hidden ">
-           <img src='/logo-1.png' alt='invoix' className="w-full h-full object-cover"/>
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/20 to-transparent" />
-            </div>
-            {isExpanded && (
-              <div className="min-w-0">
-                <p className="font-display font-bold text-sm tracking-tight text-foreground leading-none">Invokix<span className="text-[#B7FF3C]">.</span></p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">API Contract Platform</p>
-              </div>
-            )}
-          </Link>
-
-          {/* Desktop: collapse button */}
-          {!isMobile && isExpanded && (
-            <button onClick={() => setCollapsed(true)}
-              className="ml-auto h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all shrink-0"
-              title="Collapse">
-              <ArrowLineLeftIcon className="h-3.5 w-3.5" />
-            </button>
+    const renderNavGroup = (
+      items: { href: string; label: string; icon: typeof HouseIcon; exact?: boolean }[],
+      sectionLabel: string,
+      isProjectGroup = false
+    ) => (
+      <div className="mt-7">
+        <p
+          className={cn(
+            "mb-2 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground/50",
+            !expanded && "sr-only"
           )}
-
-          {/* Mobile: close X */}
-          {isMobile && (
-            <button onClick={() => setMobileOpen(false)}
-              className="ml-auto h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all shrink-0">
-              <XIcon className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-
-        {/* Desktop collapsed expand button */}
-        {!isMobile && !isExpanded && (
-          <button onClick={() => setCollapsed(false)}
-            className="mx-auto mb-2 h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
-            title="Expand">
-            <ArrowLineRightIcon className="h-3.5 w-3.5" />
-          </button>
+        >
+          {sectionLabel}
+        </p>
+        {isProjectGroup && expanded && (
+          <p className="mb-3 truncate border-l-2 border-[#B7FF3C] px-3 text-xs font-semibold text-foreground">
+            Active project
+          </p>
         )}
-
-        <Separator className="opacity-50" />
-
-        {/* Nav */}
-        <div className={cn("flex-1 py-4 space-y-1 overflow-y-auto", isExpanded ? "px-3" : "px-[10px]")}>
-
-          {isExpanded && <p className="px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">Menu</p>}
-
-          {mainNav.map(({ href, label, icon: Icon }) => {
-            const active = isActive(href)
+        <div className={cn("space-y-1", isProjectGroup && "border-l border-border/40 pl-2")}>
+          {items.map(({ href, label: itemLabel, icon: Icon, exact }) => {
+            const isActive = active(href, exact)
             return (
-              <Link key={href} href={href} title={!isExpanded ? label : undefined}
+              <Link
+                key={href}
+                href={href}
+                title={!expanded ? itemLabel : undefined}
                 className={cn(
-                  "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
-                  !isExpanded && "px-2.5 justify-center",
-                  active ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                         : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                )}>
-                <Icon weight={active ? "fill" : "regular"} className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
-                {isExpanded && <>{label}{active && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary-foreground/70" />}</>}
+                  "group relative flex h-10 items-center gap-3 px-3 text-sm font-medium transition-colors",
+                  !expanded && "justify-center px-0",
+                  isActive
+                    ? "border-l-2 border-[#B7FF3C] bg-primary/15 text-foreground"
+                    : "border-l-2 border-transparent text-muted-foreground hover:bg-white/[.045] hover:text-foreground"
+                )}
+              >
+                <Icon size={17} weight={isActive ? "fill" : "regular"} className={cn(isActive && "text-[#B7FF3C]")} />
+                <span className={!expanded ? "sr-only" : ""}>{itemLabel}</span>
+                {isActive && expanded && <span className="ml-auto h-1.5 w-1.5 bg-[#B7FF3C]" />}
               </Link>
             )
           })}
+        </div>
+      </div>
+    )
 
-          <Separator className="my-3 opacity-30" />
-
-          {isExpanded && <p className="px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">Settings</p>}
-
-          {isExpanded ? (
-            <>
-              <button onClick={() => setSettingsOpen(!settingsOpen)}
-                className={cn(
-                  "group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
-                  pathname.startsWith("/settings") ? "text-foreground bg-muted/60" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                )}>
-                <GearIcon weight={pathname.startsWith("/settings") ? "fill" : "regular"} className="h-4 w-4 shrink-0 group-hover:scale-110 transition-transform" />
-                Settings
-                <CaretRightIcon className={cn("h-3 w-3 ml-auto transition-transform duration-200", settingsOpen && "rotate-90")} />
-              </button>
-              <div className={cn("overflow-hidden transition-all duration-200", settingsOpen ? "max-h-24 opacity-100" : "max-h-0 opacity-0")}>
-                <div className="ml-3 pl-3 border-l border-border/40 space-y-0.5 pt-1">
-                  {settingsNav.map(({ href, label, icon: Icon }) => {
-                    const active = isActive(href)
-                    return (
-                      <Link key={href} href={href}
-                        className={cn(
-                          "group flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-150",
-                          active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                        )}>
-                        <Icon weight={active ? "fill" : "regular"} className="h-3.5 w-3.5 shrink-0" />
-                        {label}
-                      </Link>
-                    )
-                  })}
-                </div>
-              </div>
-            </>
-          ) : (
-            settingsNav.map(({ href, label, icon: Icon }) => {
-              const active = isActive(href)
-              return (
-                <Link key={href} href={href} title={label}
-                  className={cn(
-                    "group flex items-center justify-center px-2.5 py-2.5 rounded-lg transition-all duration-150",
-                    active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                  )}>
-                  <Icon weight={active ? "fill" : "regular"} className="h-4 w-4" />
-                </Link>
-              )
-            })
+    return (
+      <>
+        {/* Header */}
+        <div className={cn("flex h-20 items-center px-5", !expanded && "justify-center px-0")}>
+          <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
+            <div className="relative h-8 w-8 overflow-hidden rounded-lg border border-white/15 shadow-lg shadow-primary/25 shrink-0 p-1">
+              <img src="/logo.png" alt="Invokix" className="h-full w-full object-cover" />
+            </div>
+            <div className={!expanded ? "sr-only" : ""}>
+              <p className="font-display text-lg font-bold tracking-tight text-foreground">
+                Invokix<span className="text-[#B7FF3C]">.</span>
+              </p>
+              <p className="mt-0.5 text-[9px] font-medium uppercase tracking-[.14em] text-muted-foreground">
+                Contract console
+              </p>
+            </div>
+          </Link>
+          {!mobile && expanded && (
+            <button onClick={() => setCollapsed(true)} className="ml-auto text-muted-foreground/60 hover:text-foreground">
+              <ArrowLineLeftIcon size={16} />
+            </button>
           )}
-
-          <Separator className="my-3 opacity-30" />
-
-          {isExpanded && <p className="px-2 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">Resources</p>}
-
-          {resourcesNav.map(({ href, label, icon: Icon }) => (
-            <a key={label} href={href} title={!isExpanded ? label : undefined}
-              className={cn(
-                "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-150",
-                !isExpanded && "px-2.5 justify-center"
-              )}>
-              <Icon weight="regular" className="h-4 w-4 shrink-0 group-hover:scale-110 transition-transform" />
-              {isExpanded && <>{label}<ArrowSquareOutIcon className="h-3 w-3 ml-auto opacity-40 group-hover:opacity-70" /></>}
-            </a>
-          ))}
         </div>
 
-        <Separator className="opacity-50" />
+        {!mobile && !expanded && (
+          <button
+            onClick={() => setCollapsed(false)}
+            className="mb-2 grid w-full place-items-center text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLineRightIcon size={16} />
+          </button>
+        )}
 
-        {/* User footer */}
-        <div className={cn("p-3", !isExpanded && "px-[10px]")}>
-          {!isExpanded ? (
-            <div className="flex flex-col items-center gap-2">
-              <Avatar className="h-8 w-8 border-2 border-primary/30">
-                <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign out"
-                className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10">
-                <SignOutIcon className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 px-2 py-2.5 rounded-lg bg-muted/40 border border-border/30">
-              <Avatar className="h-8 w-8 border-2 border-primary/30 shrink-0">
-                <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold truncate text-foreground">{user.name}</p>
-                <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+        {/* Scrollable Navigation Area */}
+        <div className={cn("flex-1 overflow-y-auto border-t border-border/40 px-3 pb-4", !expanded && "px-2")}>
+          {renderNavGroup(primary, "Workspace")}
+
+          {/* Project Selector */}
+          {projects.length > 0 && (
+            <div className="mt-7">
+              <p
+                className={cn(
+                  "mb-2 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground/50",
+                  !expanded && "sr-only"
+                )}
+              >
+                Current project
+              </p>
+              <div className="relative">
+                {expanded ? (
+                  <button
+                    onClick={() => setProjectMenuOpen(!projectMenuOpen)}
+                    className="flex w-full items-center gap-3 border border-border/45 bg-white/[.035] px-3 py-3 text-left hover:border-primary/40"
+                  >
+                    <span className="grid h-7 w-7 place-items-center bg-primary/15 text-primary">
+                      <LightningIcon size={15} weight="fill" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-xs font-semibold text-foreground">
+                        {selectedProject?.name ?? "Select project"}
+                      </span>
+                      <span className="block text-[10px] text-muted-foreground">Contract workspace</span>
+                    </span>
+                    <CaretDownIcon
+                      size={14}
+                      className={cn("text-muted-foreground transition-transform", projectMenuOpen && "rotate-180")}
+                    />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setCollapsed(false)}
+                    title={selectedProject?.name ?? "Select project"}
+                    className="grid h-10 w-full place-items-center bg-primary/10 text-primary"
+                  >
+                    <LightningIcon size={17} weight="fill" />
+                  </button>
+                )}
+                {projectMenuOpen && expanded && (
+                  <div className="absolute inset-x-0 top-[calc(100%+4px)] z-50 max-h-56 overflow-y-auto border border-border/50 bg-[#11141C] p-1 shadow-2xl shadow-black/35">
+                    {projects.map((project) => (
+                      <button
+                        key={project.id}
+                        onClick={() => chooseProject(project.id)}
+                        className={cn(
+                          "flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs hover:bg-white/[.06]",
+                          project.id === projectId && "bg-primary/10 text-primary"
+                        )}
+                      >
+                        <span className="grid h-6 w-6 place-items-center bg-muted/40 font-display font-bold text-[10px]">
+                          {project.name.charAt(0).toUpperCase()}
+                        </span>
+                        <span className="flex-1 truncate font-medium">{project.name}</span>
+                        {project.id === projectId && <CheckIcon size={14} weight="bold" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-              <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign out"
-                className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0">
-                <SignOutIcon className="h-3.5 w-3.5" />
-              </Button>
             </div>
           )}
+
+          {projectTools.length > 0 && renderNavGroup(projectTools, "Project tools", true)}
+
+          {/* Resources Section (Docs & Templates - Horizontal Rows) */}
+          <div className="mt-7">
+            <p
+              className={cn(
+                "mb-2 px-3 text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground/50",
+                !expanded && "sr-only"
+              )}
+            >
+              Resources
+            </p>
+            <div className="space-y-1">
+              {resources.map((item) => {
+                const isActive = active(item.href)
+                const Icon = item.icon
+                const isLavender = item.accentColor === "#AE8CFF"
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    title={!expanded ? item.fullLabel : undefined}
+                    className={cn(
+                      "group relative flex h-10 items-center gap-3 px-3 text-sm font-medium transition-all duration-150 rounded-md",
+                      !expanded && "justify-center px-0 rounded-none",
+                      isActive
+                        ? isLavender
+                          ? "border-l-2 border-[#AE8CFF] bg-[#AE8CFF]/15 text-foreground"
+                          : "border-l-2 border-[#FFD15C] bg-[#FFD15C]/15 text-foreground"
+                        : isLavender
+                        ? "border-l-2 border-transparent text-muted-foreground hover:bg-[#AE8CFF]/10 hover:text-[#AE8CFF] hover:border-l-2 hover:border-[#AE8CFF]/80"
+                        : "border-l-2 border-transparent text-muted-foreground hover:bg-[#FFD15C]/10 hover:text-[#FFD15C] hover:border-l-2 hover:border-[#FFD15C]/80"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "transition-transform duration-200 group-hover:scale-110",
+                        item.hoverRotate
+                      )}
+                    >
+                      <Icon
+                        size={17}
+                        weight={isActive ? "fill" : "duotone"}
+                        style={{ color: isActive ? item.accentColor : undefined }}
+                        className={cn(!isActive && (isLavender ? "group-hover:text-[#AE8CFF]" : "group-hover:text-[#FFD15C]"))}
+                      />
+                    </div>
+                    <span className={!expanded ? "sr-only" : ""}>{item.fullLabel}</span>
+                    {expanded && (
+                      <span
+                        className={cn(
+                          "ml-auto text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border transition-colors",
+                          isLavender
+                            ? "border-[#AE8CFF]/30 bg-[#AE8CFF]/15 text-[#AE8CFF] group-hover:border-[#AE8CFF]/60"
+                            : "border-[#FFD15C]/30 bg-[#FFD15C]/15 text-[#FFD15C] group-hover:border-[#FFD15C]/60"
+                        )}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                    {isActive && expanded && (
+                      <span
+                        className="h-1.5 w-1.5 rounded-full ml-1"
+                        style={{ backgroundColor: item.accentColor }}
+                      />
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+
+          {renderNavGroup(settings, "Account")}
+        </div>
+
+        {/* Footer User Profile Card (Linear / Supabase Dark Sleek) */}
+        <div className={cn("border-t border-border/40 p-2.5", !expanded && "p-1.5")}>
+          <div
+            className={cn(
+              "group relative flex items-center gap-3 rounded-xl border border-white/[0.08] bg-[#0D0F17] p-2.5 shadow-md shadow-black/40 transition-all duration-200 hover:border-white/20 hover:bg-[#131622]",
+              !expanded && "justify-center p-1 border-transparent bg-transparent shadow-none"
+            )}
+          >
+            {/* User Avatar */}
+            <Avatar className="h-8 w-8 rounded-lg border border-white/15 bg-gradient-to-br from-white/10 to-white/[0.03] shrink-0 shadow-inner">
+              <AvatarFallback className="bg-transparent text-xs font-bold text-foreground">
+                {user.name?.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+
+            {/* User Info */}
+            <div className={cn("min-w-0 flex-1 space-y-0.5", !expanded && "sr-only")}>
+              <p className="truncate text-xs font-semibold text-foreground tracking-tight group-hover:text-white transition-colors">
+                {user.name}
+              </p>
+              <p className="truncate text-[10px] font-mono text-muted-foreground/60 leading-none">
+                {user.email}
+              </p>
+            </div>
+
+            {/* Logout Action Button */}
+            <button
+              onClick={async () => {
+                await signOut()
+                router.push("/login")
+              }}
+              title={`Sign out (${user.email})`}
+              className={cn(
+                "group/logout grid h-7 w-7 place-items-center rounded-lg border border-white/10 bg-white/[0.03] text-muted-foreground/70 hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400 active:scale-95 transition-all duration-150 shadow-sm",
+                !expanded && "h-8 w-8 bg-[#0D0F17] border-white/10"
+              )}
+            >
+              <SignOutIcon
+                size={14}
+                weight="bold"
+                className="group-hover/logout:translate-x-0.5 transition-transform duration-150"
+              />
+            </button>
+          </div>
         </div>
       </>
     )
@@ -235,42 +392,46 @@ export function Sidebar({ user }: SidebarProps) {
 
   return (
     <>
-      {/* ── Mobile topbar ──────────────────────────────────────────── */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 flex items-center gap-3 px-4 bg-sidebar border-b border-border/40">
-        <button onClick={() => setMobileOpen(true)}
-          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all">
-          <ListIcon className="h-5 w-5" />
+      {/* Mobile Top Bar */}
+      <div className="fixed inset-x-0 top-0 z-50 flex h-14 items-center gap-3 border-b border-border/40 bg-background/90 px-4 backdrop-blur md:hidden">
+        <button onClick={() => setMobileOpen(true)}>
+          <ListIcon size={20} />
         </button>
         <div className="flex items-center gap-2">
-          <div className="relative h-6 w-6 rounded-md bg-primary flex items-center justify-center shadow shadow-primary/30">
-            <LightningIcon weight="fill" className="h-3.5 w-3.5 text-white" />
+          <div className="relative h-6 w-6 overflow-hidden rounded-md border border-white/15">
+            <img src="/logo.png" alt="Invokix" className="h-full w-full object-cover" />
           </div>
-          <span className="font-display font-bold text-sm text-foreground">Invokix<span className="text-[#B7FF3C]">.</span></span>
+          <span className="font-display font-bold">
+            Invokix<span className="text-[#B7FF3C]">.</span>
+          </span>
         </div>
       </div>
 
-      {/* ── Mobile overlay ─────────────────────────────────────────── */}
+      {/* Mobile Overlay & Drawer */}
       {mobileOpen && (
-        <div
-          onClick={() => setMobileOpen(false)}
-          className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-        />
+        <>
+          <button
+            aria-label="Close menu"
+            className="fixed inset-0 z-50 bg-black/60 md:hidden"
+            onClick={() => setMobileOpen(false)}
+          />
+          <aside className="fixed inset-y-0 left-0 z-[60] flex w-72 flex-col bg-sidebar md:hidden">
+            <button onClick={() => setMobileOpen(false)} className="absolute right-4 top-5 text-muted-foreground">
+              <XIcon size={18} />
+            </button>
+            <Nav mobile />
+          </aside>
+        </>
       )}
 
-      {/* ── Mobile drawer ──────────────────────────────────────────── */}
-      <aside className={cn(
-        "md:hidden fixed top-0 left-0 h-full w-72 z-[60] flex flex-col bg-sidebar border-r border-border/40 transition-transform duration-300 ease-in-out",
-        mobileOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
-        <NavTree isMobile />
-      </aside>
-
-      {/* ── Desktop sidebar ────────────────────────────────────────── */}
-      <aside className={cn(
-        "hidden md:flex fixed left-0 top-0 h-full flex-col bg-sidebar border-r border-border/40 transition-all duration-300 ease-in-out z-40",
-        collapsed ? "w-[60px]" : "w-64"
-      )}>
-        <NavTree />
+      {/* Desktop Sidebar */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-border/45 bg-sidebar md:flex",
+          collapsed ? "w-[68px]" : "w-64"
+        )}
+      >
+        <Nav />
       </aside>
     </>
   )

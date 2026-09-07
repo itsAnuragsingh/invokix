@@ -30,7 +30,7 @@ export function DocsCode({ children, lang = "typescript", title }: DocsCodeProps
   const prismLang = lang === "text" ? "plain" : lang
 
   return (
-    <div className="not-prose my-5 rounded-xl border border-white/[0.08] overflow-hidden select-none">
+    <div className="not-prose my-5 border border-border/60 shadow-[3px_3px_0_rgba(0,0,0,0.6)] overflow-hidden select-none">
 
       {/* Title bar */}
       <div className="flex items-center justify-between px-4 py-2.5 bg-[#1c2128] border-b border-white/[0.06]">

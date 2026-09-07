@@ -42,15 +42,16 @@ type EndpointDetail = {
   security?: Array<Record<string, string[]>>
 }
 
-type OpenApiSpec = {
-  info?: { title?: string; version?: string; description?: string }
-  paths?: Record<string, Record<string, EndpointDetail>>
-}
-
 type Endpoint = {
   method: string
   path: string
   detail: EndpointDetail
+}
+
+
+type OpenApiSpec = {
+  info?: { title?: string; version?: string; description?: string }
+  paths?: Record<string, Record<string, EndpointDetail>>
 }
 
 type EndpointListProps = {
@@ -59,17 +60,17 @@ type EndpointListProps = {
 }
 
 const METHOD_CONFIG: Record<string, { bg: string; text: string; border: string; dotColor: string }> = {
-  get:    { bg: "bg-blue-500/10",    text: "text-blue-400",    border: "border-blue-500/20",    dotColor: "bg-blue-400" },
-  post:   { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/20", dotColor: "bg-emerald-400" },
-  put:    { bg: "bg-amber-500/10",   text: "text-amber-400",   border: "border-amber-500/20",   dotColor: "bg-amber-400" },
-  patch:  { bg: "bg-orange-500/10",  text: "text-orange-400",  border: "border-orange-500/20",  dotColor: "bg-orange-400" },
-  delete: { bg: "bg-red-500/10",     text: "text-red-400",     border: "border-red-500/20",     dotColor: "bg-red-400" },
+  get: { bg: "bg-[#B7FF3C]/10", text: "text-[#B7FF3C]", border: "border-[#B7FF3C]/40", dotColor: "bg-[#B7FF3C]" },
+  post: { bg: "bg-[#AE8CFF]/10", text: "text-[#AE8CFF]", border: "border-[#AE8CFF]/40", dotColor: "bg-[#AE8CFF]" },
+  put: { bg: "bg-[#FFD15C]/10", text: "text-[#FFD15C]", border: "border-[#FFD15C]/40", dotColor: "bg-[#FFD15C]" },
+  patch: { bg: "bg-[#56B6C2]/10", text: "text-[#56B6C2]", border: "border-[#56B6C2]/40", dotColor: "bg-[#56B6C2]" },
+  delete: { bg: "bg-[#F15A3C]/10", text: "text-[#F15A3C]", border: "border-[#F15A3C]/40", dotColor: "bg-[#F15A3C]" },
 }
 
 const RESPONSE_CONFIG: Record<string, string> = {
-  "2": "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  "4": "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  "5": "bg-red-500/10 text-red-400 border-red-500/20",
+  "2": "bg-[#B7FF3C]/10 text-[#B7FF3C] border-[#B7FF3C]/30",
+  "4": "bg-[#FFD15C]/10 text-[#FFD15C] border-[#FFD15C]/30",
+  "5": "bg-[#F15A3C]/10 text-[#F15A3C] border-[#F15A3C]/30",
 }
 
 export function EndpointList({ contract, projectId }: EndpointListProps) {
@@ -92,26 +93,27 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
     toast.success("Path copied")
   }
 
+  const methodSummary = endpoints.reduce<Record<string, number>>((counts, endpoint) => {
+    counts[endpoint.method] = (counts[endpoint.method] ?? 0) + 1
+    return counts
+  }, {})
+
   return (
-    <div className="space-y-3">
+    <section className="overflow-hidden border border-border/45 bg-card/20">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-5 border-b border-border/40 px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6">
         <div>
-          <h2 className="font-display font-semibold text-base text-foreground">
-            {spec?.info?.title ?? "API Contract"}
-          </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {endpoints.length} endpoints · v{spec?.info?.version ?? contract.version}
-            {spec?.info?.description && ` · ${spec.info.description}`}
-          </p>
+          <p className="text-[10px] font-bold uppercase tracking-[.16em] text-primary">API explorer</p>
+          <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-foreground">{spec?.info?.title ?? "API Contract"}</h2>
+          <p className="mt-1 text-xs text-muted-foreground">{spec?.info?.description ?? "Every available operation in the current contract."}</p>
         </div>
-        <Badge variant="outline" className="text-[10px] border-primary/20 text-primary bg-primary/5 font-mono">
-          OpenAPI 3.0
-        </Badge>
+        <div className="flex flex-wrap items-center gap-2"><span className="border border-border/50 bg-background px-2.5 py-1 font-mono text-[10px] text-muted-foreground">v{spec?.info?.version ?? contract.version}</span><span className="bg-primary px-2.5 py-1 font-mono text-[10px] font-bold text-primary-foreground">{endpoints.length} endpoints</span></div>
       </div>
 
+      <div className="flex flex-wrap gap-px border-b border-border/40 bg-border/40">{Object.entries(methodSummary).map(([method, count]) => { const c = METHOD_CONFIG[method]; return <div key={method} className="flex items-center gap-2 bg-background px-4 py-3"><span className={cn("font-mono text-[10px] font-bold uppercase", c.text)}>{method}</span><span className="text-xs font-semibold text-foreground">{count}</span></div> })}</div>
+
       {/* Endpoint cards */}
-      <div className="space-y-2">
+      <div className="divide-y divide-border/35">
         {endpoints.map(({ method, path, detail }) => {
           const key = `${method}:${path}`
           const isOpen = expanded === key
@@ -126,24 +128,24 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
               key={key}
               layout
               className={cn(
-                "rounded-xl border overflow-hidden transition-colors duration-150",
+                "overflow-hidden transition-colors duration-150",
                 isOpen
-                  ? "border-primary/30 bg-card shadow-lg shadow-primary/5"
-                  : "border-border/40 bg-card/50 hover:border-border/70 hover:bg-card/80"
+                  ? "bg-primary/[.045]"
+                  : "bg-card/10 hover:bg-white/[.035]"
               )}
             >
               {/* Endpoint row */}
               <button
                 type="button"
                 aria-label={`${method.toUpperCase()} ${path}`}
-                className="w-full text-left px-4 py-3 flex items-center gap-3 group"
+                className="w-full text-left px-5 py-4 sm:px-6 flex items-center gap-3 group"
                 onClick={() => setExpanded(isOpen ? null : key)}
               >
                 {/* Method badge */}
                 <Badge
                   variant="outline"
                   className={cn(
-                    "text-[10px] font-bold uppercase w-14 justify-center shrink-0 font-mono",
+                    "text-[10px] font-bold uppercase w-14 justify-center shrink-0 font-mono rounded-none",
                     config.bg, config.text, config.border
                   )}
                 >
@@ -165,13 +167,13 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
                 {/* Metadata pills */}
                 <div className="flex items-center gap-1.5 shrink-0">
                   {hasAuth && (
-                    <div className="flex items-center gap-1 text-[10px] text-amber-400/70 bg-amber-500/5 border border-amber-500/15 rounded-full px-1.5 py-0.5">
+                    <div className="flex items-center gap-1 text-[10px] text-amber-400/70 bg-amber-500/5 border border-amber-500/15 px-1.5 py-0.5">
                       <LockSimpleIcon weight="fill" className="h-2.5 w-2.5" />
                       Auth
                     </div>
                   )}
                   {hasBody && (
-                    <div className="flex items-center gap-1 text-[10px] text-blue-400/70 bg-blue-500/5 border border-blue-500/15 rounded-full px-1.5 py-0.5">
+                    <div className="flex items-center gap-1 text-[10px] text-blue-400/70 bg-blue-500/5 border border-blue-500/15 px-1.5 py-0.5">
                       <CodeIcon className="h-2.5 w-2.5" />
                       Body
                     </div>
@@ -203,7 +205,7 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
                     className="overflow-hidden"
                   >
                     <div className="border-t border-border/40 bg-muted/10">
-                      <div className="px-4 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="px-5 py-5 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-5">
 
                         {/* Left — path + params */}
                         <div className="space-y-3">
@@ -212,7 +214,7 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
                             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 mb-1.5">
                               Endpoint
                             </p>
-                            <div className="flex items-center gap-2 bg-[#22272e] rounded-lg px-3 py-2 border border-border/30">
+                            <div className="flex items-center gap-2 bg-[#0D1117] px-3 py-2 border border-border/30">
                               <Badge variant="outline" className={cn("text-[9px] font-bold uppercase font-mono shrink-0", config.bg, config.text, config.border)}>
                                 {method}
                               </Badge>
@@ -246,8 +248,8 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
                                 Parameters ({paramCount})
                               </p>
                               <div className="space-y-1">
-                                {detail.parameters.map((param) => (
-                                  <div key={param.name} className="flex items-center gap-2 text-xs bg-muted/30 rounded-lg px-3 py-1.5 border border-border/30">
+                                {detail.parameters.map((param: Parameter) => (
+                                  <div key={param.name} className="flex items-center gap-2 text-xs bg-muted/30 px-3 py-1.5 border border-border/30">
                                     <span className="font-mono text-foreground">{param.name}</span>
                                     <Badge variant="outline" className="text-[9px] border-border/40 text-muted-foreground font-mono">
                                       {param.in}
@@ -277,9 +279,9 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
                                 Responses
                               </p>
                               <div className="space-y-1">
-                                {Object.entries(detail.responses).map(([code, res]) => (
+                                {Object.entries(detail.responses).map(([code, res]: [string, { description?: string }]) => (
                                   <div key={code} className={cn(
-                                    "flex items-center gap-2 text-xs rounded-lg px-3 py-1.5 border",
+                                    "flex items-center gap-2 text-xs px-3 py-1.5 border",
                                     RESPONSE_CONFIG[code[0]] ?? "bg-muted/30 text-muted-foreground border-border/30"
                                   )}>
                                     <span className="font-mono font-bold">{code}</span>
@@ -296,7 +298,7 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
                               <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 mb-1.5">
                                 Operation ID
                               </p>
-                              <span className="font-mono text-xs text-primary bg-primary/5 border border-primary/20 rounded-md px-2 py-1">
+                              <span className="font-mono text-xs text-primary bg-primary/5 border border-primary/20 px-2 py-1">
                                 {detail.operationId}
                               </span>
                             </div>
@@ -308,7 +310,7 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
                               <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 mb-1.5">
                                 Request Body
                               </p>
-                              <div className="flex items-center gap-2 text-xs bg-blue-500/5 border border-blue-500/20 rounded-lg px-3 py-1.5 text-blue-400">
+                              <div className="flex items-center gap-2 text-xs bg-blue-500/5 border border-blue-500/20 px-3 py-1.5 text-blue-400">
                                 <CodeIcon className="h-3 w-3" />
                                 {detail.requestBody?.required ? "Required" : "Optional"} body
                               </div>
@@ -324,6 +326,6 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
           )
         })}
       </div>
-    </div>
+    </section>
   )
 }

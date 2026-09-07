@@ -87,30 +87,25 @@ export function DocsNav() {
                     href={item.href}
                     className={cn(
                       "group relative flex items-center justify-between gap-2",
-                      "px-2 py-1.5 rounded-lg text-sm transition-all duration-150",
+                      "px-2.5 py-1.5 text-sm transition-all duration-150 font-sans",
                       isActive
-                        ? "bg-primary/10 text-primary font-medium"
-                        : "text-muted-foreground/60 hover:text-foreground hover:bg-white/[0.04]"
+                        ? "bg-[#B7FF3C]/10 text-[#B7FF3C] font-semibold border-l-2 border-[#B7FF3C]"
+                        : "text-muted-foreground/70 hover:text-foreground hover:bg-white/[0.04] border-l-2 border-transparent"
                     )}
                   >
-                    {/* Active indicator bar */}
-                    {isActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full" />
-                    )}
-
-                    <span className="pl-1">{item.title}</span>
+                    <span className="pl-0.5">{item.title}</span>
 
                     {/* Badge */}
                     {item.badge && (
                       <span className={cn(
-                        "text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full shrink-0",
+                        "text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 shrink-0 border",
                         item.badge === "AI"
-                          ? "bg-violet-500/15 text-violet-400 border border-violet-500/20"
+                          ? "bg-[#AE8CFF]/15 text-[#AE8CFF] border-[#AE8CFF]/30"
                           : item.badge === "Only"
-                          ? "bg-primary/15 text-primary border border-primary/20"
+                          ? "bg-[#56B6C2]/15 text-[#56B6C2] border-[#56B6C2]/30"
                           : item.badge === "New"
-                          ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
-                          : "bg-muted text-muted-foreground"
+                          ? "bg-[#B7FF3C]/15 text-[#B7FF3C] border-[#B7FF3C]/30"
+                          : "bg-muted text-muted-foreground border-border/40"
                       )}>
                         {item.badge}
                       </span>

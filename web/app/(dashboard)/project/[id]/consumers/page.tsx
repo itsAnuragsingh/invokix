@@ -7,14 +7,6 @@ import { db } from "@/lib/db"
 import { consumers } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { ConsumerTable } from "@/components/dashboard/ConsumerTable"
-import { Badge } from "@/components/ui/badge"
-import {
-  LightningIcon,
-  GitBranchIcon,
-  UsersIcon,
-  GearIcon,
-  ShareNetworkIcon,
-} from "@phosphor-icons/react/dist/ssr"
 import Link from "next/link"
 import { getUserPlan } from "@/lib/plans/usage"
 import { PLAN_LIMITS } from "@/lib/plans/limits"
@@ -37,8 +29,8 @@ export default async function ConsumersPage({ params }: Props) {
   if (!contract) redirect(`/project/${id}`)
 
   return (
-    <div className="space-y-0 animate-fade-up">
-      <div className="flex items-start justify-between pb-5">
+    <div className="mx-auto max-w-7xl animate-fade-up">
+      <div className="border-b border-border/45 pb-7">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Link href="/dashboard" className="text-xs text-muted-foreground hover:text-foreground transition-colors">Projects</Link>
@@ -47,36 +39,15 @@ export default async function ConsumersPage({ params }: Props) {
             <span className="text-muted-foreground/40 text-xs">›</span>
             <span className="text-xs text-foreground font-medium">Consumers</span>
           </div>
-          <div className="flex items-center gap-3">
-            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">Consumers</h1>
-          </div>
+          <h1 className="mt-4 font-display text-4xl font-bold tracking-tight text-foreground">Consumers.</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Every team consuming this contract — version, source, last seen
           </p>
         </div>
       </div>
 
-      {/* Nav */}
-      <div className="flex items-center gap-1 border-b border-border/50 mb-8">
-        {[
-          { href: `/project/${id}`, label: "Contract", icon: LightningIcon },
-          { href: `/project/${id}/history`, label: "History", icon: GitBranchIcon },
-          { href: `/project/${id}/consumers`, label: "Consumers", icon: UsersIcon, active: true },
-          { href: `/project/${id}/settings`, label: "Settings", icon: GearIcon },
-          { href: `/share/${contract.id}`, label: "Share ↗", icon: ShareNetworkIcon, external: true },
-        ].map(({ href, label, icon: Icon, active, external }) => (
-          <Link key={href} href={href} target={external ? "_blank" : undefined}
-            className={`flex items-center gap-1.5 px-3 py-2.5 text-sm border-b-2 transition-all duration-150 -mb-px ${
-              active ? "text-foreground border-primary" : "text-muted-foreground border-transparent hover:text-foreground hover:border-primary/50"
-            }`}
-          >
-            <Icon className="h-3.5 w-3.5" />{label}
-          </Link>
-        ))}
-      </div>
-
       {/* Plan gate */}
-      {!limits.canConsumerTracking ? (
+      <div className="mt-8">{!limits.canConsumerTracking ? (
         <UpgradeBanner
           feature="Consumer Tracking"
           requiredPlan="pro"
@@ -85,7 +56,7 @@ export default async function ConsumersPage({ params }: Props) {
         />
       ) : (
         <ConsumerTableWrapper contractId={contract.id} contractVersion={contract.version} />
-      )}
+      )}</div>
     </div>
   )
 }
@@ -98,9 +69,7 @@ async function ConsumerTableWrapper({ contractId, contractVersion }: { contractI
 
   return (
     <>
-      <Badge variant="outline" className="font-mono text-xs border-primary/30 text-primary bg-primary/5 mb-4">
-        {contractConsumers.length} total
-      </Badge>
+      <p className="mb-4 text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground">{contractConsumers.length} tracked consumer{contractConsumers.length === 1 ? "" : "s"}</p>
       <ConsumerTable consumers={contractConsumers} currentVersion={contractVersion} />
     </>
   )

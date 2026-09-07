@@ -1,164 +1,21 @@
-// app/(dashboard)/dashboard/page.tsx
 import { requireSession } from "@/lib/auth/session"
 import { redirect } from "next/navigation"
 import { getProjectsByUserId } from "@/lib/db/queries/projects"
 import { ProjectCard } from "@/components/dashboard/ProjectCard"
 import { CreateProjectDialog } from "@/components/dashboard/CreateProjectDialog"
-import { LightningIcon } from "@phosphor-icons/react/dist/ssr"
+import { ArrowRightIcon, LightningIcon, SparkleIcon } from "@phosphor-icons/react/dist/ssr"
 import { getUserPlan, countMonthlyAiGenerations, checkContractLimit } from "@/lib/plans/usage"
 import { PLAN_LIMITS, PLAN_DISPLAY } from "@/lib/plans/limits"
 
 export default async function DashboardPage() {
   const session = await requireSession()
   if (!session) redirect("/login")
-
-  const [projects, plan, aiUsed, contractLimit] = await Promise.all([
-    getProjectsByUserId(session.user.id),
-    getUserPlan(session.user.id),
-    countMonthlyAiGenerations(session.user.id),
-    checkContractLimit(session.user.id),
-  ])
-
+  const [projects, plan, aiUsed, contractLimit] = await Promise.all([getProjectsByUserId(session.user.id), getUserPlan(session.user.id), countMonthlyAiGenerations(session.user.id), checkContractLimit(session.user.id)])
   const limits = PLAN_LIMITS[plan]
   const planDisplay = PLAN_DISPLAY[plan]
   const firstName = session.user.name?.split(" ")[0] ?? "there"
   const aiMax = limits.maxAiGenerationsPerMonth
   const aiPercent = aiMax === Infinity ? 0 : Math.min((aiUsed / aiMax) * 100, 100)
-
-  return (
-    <div className="space-y-10 animate-fade-up">
-
-      {/* ── Header ──────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5 mb-2">
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-primary/70">
-              Welcome back
-            </p>
-            <span className="inline-flex items-center rounded-full border border-[#B7FF3C]/30 bg-[#B7FF3C]/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#B7FF3C]">
-              {planDisplay.badge}
-            </span>
-          </div>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-none">
-            {firstName}
-          </h1>
-          <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-            <span>
-              {projects.length === 0
-                ? "Create your first API contract to get started."
-                : `${projects.length} project${projects.length !== 1 ? "s" : ""}`}
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/80 pl-1 border-l border-border/40">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#B7FF3C] animate-pulse" />
-              All systems operational
-            </span>
-          </div>
-        </div>
-        <CreateProjectDialog />
-      </div>
-
-      {/* ── Stat cards ──────────────────────────────────────────────── */}
-      {projects.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Projects / Contract Limit */}
-          <div className="group relative rounded-2xl border border-border/40 bg-card/40 px-5 py-4 overflow-hidden transition-all duration-200 hover:border-border/70 hover:bg-card/60">
-            <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[#B7FF3C]/40 to-transparent" />
-            <p className="font-display text-3xl font-bold text-foreground">
-              {contractLimit.current}
-              {contractLimit.limit !== Infinity && (
-                <span className="text-lg text-muted-foreground font-normal">/{contractLimit.limit}</span>
-              )}
-            </p>
-            <p className="text-xs font-semibold text-foreground/70 mt-1">Contracts</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              {contractLimit.limit === Infinity
-                ? "Unlimited on your plan"
-                : contractLimit.allowed
-                  ? `${contractLimit.limit - contractLimit.current} remaining`
-                  : "Limit reached — upgrade to add more"}
-            </p>
-          </div>
-
-          {/* AI Generations */}
-          <div className="group relative rounded-2xl border border-border/40 bg-card/40 px-5 py-4 overflow-hidden transition-all duration-200 hover:border-border/70 hover:bg-card/60">
-            <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[#B7FF3C]/40 to-transparent" />
-            <p className="font-display text-3xl font-bold text-foreground">
-              {aiUsed}
-              {aiMax !== Infinity && (
-                <span className="text-lg text-muted-foreground font-normal">/{aiMax}</span>
-              )}
-            </p>
-            <p className="text-xs font-semibold text-foreground/70 mt-1">AI Generations</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">This month</p>
-            {aiMax !== Infinity && (
-              <div className="mt-2 h-1 w-full rounded-full bg-border/50 overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    aiPercent >= 90 ? "bg-red-500" : aiPercent >= 70 ? "bg-amber-500" : "bg-primary"
-                  }`}
-                  style={{ width: `${aiPercent}%` }}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Health Score */}
-          <div className="group relative rounded-2xl border border-border/40 bg-card/40 px-5 py-4 overflow-hidden transition-all duration-200 hover:border-border/70 hover:bg-card/60">
-            <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[#B7FF3C]/40 to-transparent" />
-            <p className="font-display text-3xl font-bold text-foreground">—</p>
-            <p className="text-xs font-semibold text-foreground/70 mt-1">Avg Health Score</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Publish a contract to track</p>
-          </div>
-        </div>
-      )}
-
-      {/* ── Projects ────────────────────────────────────────────────── */}
-      {projects.length === 0 ? (
-        <div className="relative rounded-2xl border border-dashed border-border/50 bg-card/20 p-20 text-center overflow-hidden">
-          <div className="absolute inset-0 bg-grid opacity-20" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
-          <div className="relative flex flex-col items-center gap-4">
-            <div className="h-14 w-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <LightningIcon weight="fill" className="h-7 w-7 text-primary" />
-            </div>
-            <div>
-              <h2 className="font-display text-xl font-bold text-foreground">No projects yet</h2>
-              <p className="text-muted-foreground text-sm mt-1.5 max-w-xs mx-auto leading-relaxed">
-                Create your first project and generate TypeScript types, React Query hooks, and Zod schemas instantly.
-              </p>
-            </div>
-            <CreateProjectDialog />
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground/50">
-              Projects · {projects.length}
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {projects.map((project, i) => (
-              <div
-                key={project.id}
-                className="animate-fade-up"
-                style={{
-                  animationDelay: `${i * 0.05}s`,
-                  opacity: 0,
-                  animationFillMode: "forwards",
-                }}
-              >
-                <ProjectCard
-                  project={project}
-                  memberRole={
-                    (project as { memberRole?: "owner" | "editor" | "viewer" }).memberRole
-                  }
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
+  const stats = [{ label: "Contracts", value: contractLimit.current, meta: contractLimit.limit === Infinity ? "Unlimited on your plan" : `${Math.max(contractLimit.limit - contractLimit.current, 0)} remaining`, suffix: contractLimit.limit === Infinity ? "" : `/${contractLimit.limit}` }, { label: "AI generations", value: aiUsed, meta: aiMax === Infinity ? "Unlimited this month" : `${Math.round(aiPercent)}% of monthly allowance`, suffix: aiMax === Infinity ? "" : `/${aiMax}` }, { label: "Workspace health", value: "—", meta: "Publish a contract to calculate", suffix: "" }]
+  return <div className="mx-auto max-w-7xl animate-fade-up"><header className="border-b border-border/45 pb-7 sm:flex sm:items-end sm:justify-between"><div><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground"><span className="h-1.5 w-1.5 bg-[#B7FF3C] shadow-[0_0_12px_#B7FF3C]" /> Workspace overview <span className="border-l border-border/50 pl-2 text-primary">{planDisplay.badge}</span></div><h1 className="mt-4 font-display text-4xl font-bold tracking-tight text-foreground">Good to see you, {firstName}.</h1><p className="mt-2 text-sm text-muted-foreground">Your contracts, changes, and release activity—at a glance.</p></div><div className="mt-5 sm:mt-0"><CreateProjectDialog /></div></header>{projects.length > 0 ? <><section className="grid gap-px border-b border-border/45 bg-border/45 sm:grid-cols-3">{stats.map((stat, index) => <article key={stat.label} className="bg-background px-5 py-6 sm:px-7"><p className="text-[10px] font-bold uppercase tracking-[.14em] text-muted-foreground">{stat.label}</p><p className="mt-3 font-display text-4xl font-bold tracking-tight text-foreground">{stat.value}<span className="ml-1 text-lg font-normal text-muted-foreground">{stat.suffix}</span></p><p className="mt-2 text-xs text-muted-foreground">{stat.meta}</p>{index === 1 && aiMax !== Infinity && <div className="mt-4 h-1 w-full bg-border/60"><div className="h-full bg-primary" style={{ width: `${aiPercent}%` }} /></div>}</article>)}</section><section className="mt-10"><div className="mb-5 flex items-center justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground">Your projects</p><p className="mt-1 text-sm text-muted-foreground">{projects.length} active workspace{projects.length === 1 ? "" : "s"}</p></div><span className="hidden text-xs text-muted-foreground sm:block">Select a project to manage its contract</span></div><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{projects.map((project) => <ProjectCard key={project.id} project={project} memberRole={(project as { memberRole?: "owner" | "editor" | "viewer" }).memberRole} />)}</div></section></> : <section className="relative mt-10 overflow-hidden border border-border/45 bg-card/25 px-6 py-16 sm:p-20"><div className="absolute right-0 top-0 h-full w-1/2 bg-[radial-gradient(circle_at_center,rgba(99,102,241,.12),transparent_65%)]" /><div className="relative max-w-lg"><div className="grid h-11 w-11 place-items-center bg-primary text-white shadow-lg shadow-primary/25"><SparkleIcon size={21} weight="fill" /></div><p className="mt-8 text-[10px] font-bold uppercase tracking-[.16em] text-primary">Your first workspace</p><h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground">Start with one contract.</h2><p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">Create a project to define the API, generate types and validation, and make each future release clear for every consumer.</p><div className="mt-7"><CreateProjectDialog /></div></div></section>}<section className="mt-10 flex flex-col gap-3 border-t border-border/45 pt-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"><span className="flex items-center gap-2"><LightningIcon size={15} className="text-[#B7FF3C]" weight="fill" /> All systems operational</span><span className="flex items-center gap-1 font-medium text-foreground">Need a hand? Read the docs <ArrowRightIcon size={13} /></span></section></div>
 }

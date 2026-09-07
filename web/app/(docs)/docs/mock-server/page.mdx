@@ -1,5 +1,6 @@
 import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
 import { DocsCode } from "@/components/docs/DocsCode"
+import { DocsImageCard } from "@/components/docs/DocsImageCard"
 import Link from "next/link"
 
 export const metadata = {
@@ -17,6 +18,12 @@ export const metadata = {
 ## How it works
 
 When you publish, Invokix reads your OpenAPI contract and starts a Prism-compatible mock server. The server returns realistic fake data that matches your schema exactly — correct types, correct field names, correct enum values, correct formats like UUIDs and ISO dates.
+
+<DocsImageCard
+  src="/docs-mock-server.png"
+  alt="Automated Mock Server Pipeline"
+  caption="Live Mock Server Engine: Instant response payload synthesis, OpenAPI route handling, and zero-latency client mocking."
+/>
 
 Your mock URL is always available in the **Mock** tab of your project. It updates automatically every time you publish a new version.
 

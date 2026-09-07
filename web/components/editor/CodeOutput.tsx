@@ -144,10 +144,10 @@ export function CodeOutput({ types, hooks, nativeHooks, zod, stack = "nextjs" }:
               type="button"
               onClick={() => setActive(tab.id)}
               className={cn(
-                "px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-150 font-mono",
+                "px-3 py-1.5 text-xs font-mono font-bold rounded-md transition-all duration-150",
                 active === tab.id
-                  ? "bg-primary/15 text-primary border border-primary/25"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "bg-[#B7FF3C]/10 text-[#B7FF3C] border border-[#B7FF3C]/40 shadow-[2px_2px_0_rgba(183,255,60,0.2)]"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-transparent"
               )}
             >
               {tab.label}
@@ -161,22 +161,22 @@ export function CodeOutput({ types, hooks, nativeHooks, zod, stack = "nextjs" }:
             {current.filename}
           </span>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={handleCopy}
-            className="h-7 px-2.5 text-xs text-muted-foreground hover:text-foreground gap-1.5"
+            className="h-7 px-2.5 text-xs font-mono border-border/60 bg-background/50 text-muted-foreground hover:text-[#B7FF3C] hover:border-[#B7FF3C]/50 shadow-[1px_1px_0_rgba(0,0,0,0.5)] gap-1.5"
           >
             {copied
-              ? <CheckIcon className="h-3.5 w-3.5 text-emerald-400" />
+              ? <CheckIcon className="h-3.5 w-3.5 text-[#B7FF3C]" />
               : <CopyIcon className="h-3.5 w-3.5" />
             }
             {copied ? "Copied" : "Copy"}
           </Button>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={handleDownload}
-            className="h-7 px-2.5 text-xs text-muted-foreground hover:text-foreground gap-1.5"
+            className="h-7 px-2.5 text-xs font-mono border-border/60 bg-background/50 text-muted-foreground hover:text-foreground hover:border-border shadow-[1px_1px_0_rgba(0,0,0,0.5)] gap-1.5"
           >
             <DownloadSimpleIcon className="h-3.5 w-3.5" />
             Download

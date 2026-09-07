@@ -23,13 +23,13 @@ export function CopyDocsCode({ code }: { code: string }) {
     >
       {copied ? (
         <>
-          <CheckIcon size={11} className="text-emerald-400" />
-          <span className="text-emerald-400">Copied</span>
+          <CheckIcon size={11} className="text-[#B7FF3C]" />
+          <span className="text-[#B7FF3C] font-mono font-bold">Copied</span>
         </>
       ) : (
         <>
           <CopyIcon size={11} />
-          <span>Copy</span>
+          <span className="font-mono">Copy</span>
         </>
       )}
     </button>

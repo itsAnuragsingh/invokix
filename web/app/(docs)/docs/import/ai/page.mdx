@@ -1,5 +1,6 @@
 import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
 import { DocsCode } from "@/components/docs/DocsCode"
+import { DocsImageCard } from "@/components/docs/DocsImageCard"
 import Link from "next/link"
 
 export const metadata = {
@@ -17,6 +18,12 @@ export const metadata = {
 <p className="text-base text-foreground/80 leading-relaxed mb-8">
   Describe your API in plain English. Invokix generates a complete, production-ready OpenAPI contract in seconds — with proper types, error schemas, authentication, and realistic example values. Your frontend team can start building before your backend team writes a single line of code.
 </p>
+
+<DocsImageCard
+  src="/docs-ai-generator.png"
+  alt="AI Plain-English API Spec Generator"
+  caption="AI Contract Generator: Natural language prompt parsing into full OpenAPI 3.0 schemas with instant type derivation."
+/>
 
 ## How it works
 
@@ -167,8 +174,8 @@ The more specific your description, the better the output:
 
 | Plan | Model |
 |---|---|
-| Free | Groq Llama 4 Scout |
-| Starter | Groq Llama 4 Maverick |
+| Free | Groq Qwen 3.8 |
+| Starter | Groq Qwen 3.8 |
 | Team | Claude Haiku |
 | BYOK | Your own key |
 

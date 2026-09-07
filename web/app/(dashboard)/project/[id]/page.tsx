@@ -9,7 +9,6 @@ import { GenerateButton } from "@/components/editor/GenerateButton"
 import { GenerateFromText } from "@/components/editor/GenerateFromText"
 import { PublishButton } from "@/components/editor/PublishButton"
 import { EditSpecModal } from "@/components/editor/EditSpecModal"
-import { ProjectNav } from "@/components/editor/ProjectNav"
 import { ProjectStatBar } from "@/components/editor/ProjectStatBar"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
@@ -51,10 +50,10 @@ export default async function ProjectPage({ params }: Props) {
     : null
 
   return (
-    <div className="animate-fade-up space-y-6">
+    <div className="mx-auto max-w-7xl animate-fade-up space-y-7">
 
       {/* ── Breadcrumb ──────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 text-[11px] font-medium">
         <Link
           href="/dashboard"
           className="text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -66,9 +65,11 @@ export default async function ProjectPage({ params }: Props) {
       </div>
 
       {/* ── Header ──────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="relative overflow-hidden border border-border/45 bg-card/30 px-5 py-5 sm:px-7 sm:py-6">
+        <div className="absolute inset-y-0 left-0 w-1 bg-primary" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="h-11 w-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+          <div className="h-11 w-11 bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
             <span className="text-primary font-display font-bold text-base">
               {project.name.charAt(0).toUpperCase()}
             </span>
@@ -79,7 +80,7 @@ export default async function ProjectPage({ params }: Props) {
                 {project.name}
               </h1>
               {contract && (
-                <span className="font-mono text-[11px] text-primary border border-primary/30 bg-primary/5 px-2 py-0.5 rounded-full shrink-0">
+                <span className="font-mono text-[11px] text-primary border border-primary/30 bg-primary/5 px-2 py-0.5 shrink-0">
                   v{contract.version}
                 </span>
               )}
@@ -102,11 +103,12 @@ export default async function ProjectPage({ params }: Props) {
             <PublishButton projectId={id} />
           </div>
         )}
+        </div>
       </div>
 
       {/* ── Stat bar ────────────────────────────────────────────────── */}
       {contract && (
-        <ProjectStatBar
+        <div className="border border-border/45 bg-card/20 px-1 py-1"><ProjectStatBar
           healthScore={contract.healthScore}
           endpointCount={endpointCount}
           version={contract.version}
@@ -114,11 +116,8 @@ export default async function ProjectPage({ params }: Props) {
           mockUrl={mockUrl!}
           projectId={id}
           contractId={contract.id}
-        />
+        /></div>
       )}
-
-      {/* ── Nav ─────────────────────────────────────────────────────── */}
-      {contract && <ProjectNav id={id} contractId={contract.id} />}
 
       {/* ── Content ─────────────────────────────────────────────────── */}
       {!contract ? (

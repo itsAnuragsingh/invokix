@@ -27,10 +27,10 @@ type ConsumerTableProps = {
 }
 
 const SOURCE_CONFIG = {
-  web: { icon: GlobeIcon, label: "Web", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
-  cli: { icon: TerminalIcon, label: "CLI", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
-  api: { icon: PlugIcon, label: "API", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
-  postman: { icon: LinkIcon, label: "Postman", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
+  web: { icon: GlobeIcon, label: "Web", color: "text-[#56B6C2]", bg: "bg-[#56B6C2]/10 border-[#56B6C2]/30" },
+  cli: { icon: TerminalIcon, label: "CLI", color: "text-[#B7FF3C]", bg: "bg-[#B7FF3C]/10 border-[#B7FF3C]/30" },
+  api: { icon: PlugIcon, label: "API", color: "text-[#AE8CFF]", bg: "bg-[#AE8CFF]/10 border-[#AE8CFF]/30" },
+  postman: { icon: LinkIcon, label: "Postman", color: "text-[#FFD15C]", bg: "bg-[#FFD15C]/10 border-[#FFD15C]/30" },
 }
 
 function isOutdated(version: string, current: string): boolean {
@@ -78,16 +78,16 @@ export function ConsumerTable({ consumers, currentVersion }: ConsumerTableProps)
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: "Total consumers", value: consumers.length, color: "text-foreground" },
-          { label: "Up to date", value: upToDate.length, color: "text-emerald-400" },
-          { label: "Outdated", value: outdated.length, color: "text-amber-400" },
-          { label: "Current version", value: `v${currentVersion}`, color: "text-primary" },
+          { label: "Up to date", value: upToDate.length, color: "text-[#B7FF3C]" },
+          { label: "Outdated", value: outdated.length, color: "text-[#F15A3C]" },
+          { label: "Current version", value: `v${currentVersion}`, color: "text-[#AE8CFF]" },
         ].map(({ label, value, color }, i) => (
           <motion.div
             key={label}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.06 }}
-            className="rounded-xl border border-border/50 bg-card/50 px-4 py-3 space-y-1"
+            className="border border-border/60 bg-card/50 px-4 py-3 space-y-1 shadow-[2px_2px_0_rgba(0,0,0,0.6)]"
           >
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">{label}</p>
             <p className={cn("text-xl font-display font-bold", color)}>{value}</p>
@@ -100,14 +100,14 @@ export function ConsumerTable({ consumers, currentVersion }: ConsumerTableProps)
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-start gap-3 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5"
+          className="flex items-start gap-3 p-4 border border-[#F15A3C]/30 bg-[#F15A3C]/10 shadow-[2px_2px_0_rgba(241,90,60,0.2)]"
         >
-          <WarningIcon weight="fill" className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />
+          <WarningIcon weight="fill" className="h-4 w-4 text-[#F15A3C] mt-0.5 shrink-0" />
           <div>
-            <p className="text-sm font-semibold text-amber-400">
+            <p className="text-sm font-semibold text-[#F15A3C]">
               {outdated.length} consumer{outdated.length !== 1 ? "s" : ""} on an older version
             </p>
-            <p className="text-xs text-amber-400/70 mt-0.5">
+            <p className="text-xs text-[#F15A3C]/80 mt-0.5">
               They may be affected by recent changes. Consider notifying them.
             </p>
           </div>
@@ -115,7 +115,7 @@ export function ConsumerTable({ consumers, currentVersion }: ConsumerTableProps)
       )}
 
       {/* Table */}
-      <div className="rounded-xl border border-border/50 bg-card/50 overflow-hidden">
+      <div className="border border-border/60 bg-card/50 overflow-hidden shadow-[3px_3px_0_rgba(0,0,0,0.7)]">
         {/* Table header */}
         <div className="px-4 py-3 border-b border-border/40 bg-muted/20 grid grid-cols-12 gap-4">
           {["Consumer", "Source", "Version", "Status", "Last seen"].map((h) => (
@@ -143,11 +143,11 @@ export function ConsumerTable({ consumers, currentVersion }: ConsumerTableProps)
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="px-4 py-3.5 grid grid-cols-12 gap-4 items-center hover:bg-muted/20 transition-colors"
+                className="px-4 py-3.5 grid grid-cols-12 gap-4 items-center hover:bg-white/[0.03] transition-colors"
               >
                 {/* Consumer ID */}
                 <div className="col-span-4 flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-lg bg-muted/50 border border-border/40 flex items-center justify-center shrink-0">
+                  <div className="h-8 w-8 bg-muted/50 border border-border/40 flex items-center justify-center shrink-0">
                     <SrcIcon className={cn("h-4 w-4", src.color)} />
                   </div>
                   <div className="min-w-0">
@@ -162,7 +162,7 @@ export function ConsumerTable({ consumers, currentVersion }: ConsumerTableProps)
 
                 {/* Source */}
                 <div className="col-span-2">
-                  <Badge variant="outline" className={cn("text-[10px] gap-1", src.bg, src.color)}>
+                  <Badge variant="outline" className={cn("text-[10px] font-mono gap-1 rounded-none border shadow-[1px_1px_0_rgba(0,0,0,0.5)]", src.bg, src.color)}>
                     <SrcIcon className="h-2.5 w-2.5" />
                     {src.label}
                   </Badge>
@@ -171,26 +171,26 @@ export function ConsumerTable({ consumers, currentVersion }: ConsumerTableProps)
                 {/* Version */}
                 <div className="col-span-2">
                   <Badge variant="outline" className={cn(
-                    "text-[10px] font-mono",
+                    "text-[10px] font-mono rounded-none border shadow-[1px_1px_0_rgba(0,0,0,0.5)]",
                     outdatedConsumer
-                      ? "border-amber-500/20 text-amber-400 bg-amber-500/5"
-                      : "border-emerald-500/20 text-emerald-400 bg-emerald-500/5"
+                      ? "border-[#F15A3C]/30 text-[#F15A3C] bg-[#F15A3C]/10"
+                      : "border-[#B7FF3C]/30 text-[#B7FF3C] bg-[#B7FF3C]/10"
                   )}>
                     v{consumer.version}
                   </Badge>
                 </div>
 
                 {/* Status */}
-                <div className="col-span-2 flex items-center gap-1.5">
+                <div className="col-span-2 flex items-center gap-1.5 font-mono text-xs font-bold">
                   {outdatedConsumer ? (
                     <>
-                      <WarningIcon weight="fill" className="h-3 w-3 text-amber-400" />
-                      <span className="text-[11px] text-amber-400">Outdated</span>
+                      <WarningIcon weight="fill" className="h-3 w-3 text-[#F15A3C]" />
+                      <span className="text-[11px] text-[#F15A3C]">Outdated</span>
                     </>
                   ) : (
                     <>
-                      <CheckCircleIcon weight="fill" className="h-3 w-3 text-emerald-400" />
-                      <span className="text-[11px] text-emerald-400">Current</span>
+                      <CheckCircleIcon weight="fill" className="h-3 w-3 text-[#B7FF3C]" />
+                      <span className="text-[11px] text-[#B7FF3C]">Current</span>
                     </>
                   )}
                 </div>

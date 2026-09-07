@@ -123,7 +123,7 @@ export function ImportPanel({ projectId }: ImportPanelProps) {
                 }
               />
               <p className="text-[10px] text-muted-foreground/50 text-center">
-                Powered by Groq Llama 4 · Free
+                Powered by Groq GPT-OSS 120B · Free
               </p>
             </div>
           </div>

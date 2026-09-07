@@ -7,13 +7,16 @@ const groq = new Groq({
 
 /** Robustly extract the first valid JSON object from raw LLM output */
 function extractJson(raw: string): string {
-  // 1. Strip common markdown fences
-  let cleaned = raw
+  // 1. Strip <think>...</think> reasoning blocks emitted by models
+  let cleaned = raw.replace(/<think>[\s\S]*?<\/think>/gi, "").trim()
+
+  // 2. Strip common markdown fences
+  cleaned = cleaned
     .replace(/```json\s*/gi, "")
     .replace(/```\s*/g, "")
     .trim()
 
-  // 2. Find the first { and last } to slice out the JSON object
+  // 3. Find the first { and last } to slice out the JSON object
   const start = cleaned.indexOf("{")
   const end = cleaned.lastIndexOf("}")
 
@@ -51,49 +54,30 @@ Rules:
 The user will describe an API in plain English.
 You must respond with ONLY a valid OpenAPI 3.0 JSON spec — no explanation, no markdown, no code fences.
 
-Always include:
-- info.title and info.version
-- At least one path with proper HTTP methods
-- components.schemas for all data models
-- Proper response schemas with 200, 401, 500 responses
-- Request body schemas for POST/PUT/PATCH endpoints
+CRITICAL INSTRUCTIONS FOR COMPLETE ENDPOINT COVERAGE:
+- You MUST generate an OpenAPI path entry for EVERY single endpoint listed or implied in the user prompt.
+- Do NOT truncate, sample, or omit any endpoints. If the user lists 9 endpoints, your "paths" object MUST contain all 9 endpoints.
+- Convert path parameters from Express ":id" syntax to OpenAPI "{id}" syntax (e.g. /events/:id -> /events/{id}).
+- Define core entities in "components.schemas" (e.g. Event, Booking, Seat, User) and reference them using "$ref": "#/components/schemas/ModelName".
+- Include all requested HTTP status codes (200, 201, 400, 401, 403, 409, 410, 500).
+- Keep endpoint summaries and descriptions concise (max 1 sentence) so the specification stays complete and compact.
 
-CRITICAL — every schema field must follow these rules:
-- Every field must have an "example" with a realistic value
-  Good: "price": { "type": "number", "minimum": 0, "example": 29.99 }
-  Bad:  "price": { "type": "number" }
-- All number fields representing counts, prices, quantities, ages, scores must have "minimum": 0
+CRITICAL SCHEMA RULES:
+- Every field in components.schemas must have a realistic "example" value
 - All ID fields must use "type": "string", "format": "uuid", "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 - All date fields must use "type": "string", "format": "date-time", "example": "2024-03-15T10:30:00Z"
-- All email fields must use "format": "email", "example": "user@example.com"
-- All name fields must have "minLength": 1, "example": "John Doe"
-- Enum fields must list all valid values in "enum" array
-- Array fields must have "minItems": 0 and items schema with examples
-- securitySchemes must always be inside components, never at the root level
-- Status fields must use enum with realistic values like ["pending", "active", "completed"]
-
-Example of a well-formed schema:
-"Order": {
-  "type": "object",
-  "required": ["id", "userId", "status", "total"],
-  "properties": {
-    "id": { "type": "string", "format": "uuid", "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479" },
-    "userId": { "type": "string", "format": "uuid", "example": "550e8400-e29b-41d4-a716-446655440000" },
-    "status": { "type": "string", "enum": ["pending", "shipped", "delivered", "cancelled"], "example": "pending" },
-    "total": { "type": "number", "minimum": 0, "example": 49.99 },
-    "quantity": { "type": "integer", "minimum": 1, "maximum": 100, "example": 2 },
-    "createdAt": { "type": "string", "format": "date-time", "example": "2024-03-15T10:30:00Z" }
-  }
-}`
+- Enum fields must list all valid values in an "enum" array
+- securitySchemes must be placed inside components.securitySchemes`
 
   const response = await groq.chat.completions.create({
-    model: "meta-llama/llama-4-scout-17b-16e-instruct",
+    model: "openai/gpt-oss-120b",
+    response_format: { type: "json_object" },
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: plainEnglish },
     ],
-    temperature: 0.3,
-    max_tokens: 4000,
+    temperature: 0.1,
+    max_tokens: 8000,
   })
 
   const content = response.choices[0]?.message?.content
@@ -104,7 +88,8 @@ Example of a well-formed schema:
 
 export async function extractSpecFromCode(routeCode: string): Promise<string> {
   const response = await groq.chat.completions.create({
-    model: "meta-llama/llama-4-scout-17b-16e-instruct",
+    model: "openai/gpt-oss-120b",
+    response_format: { type: "json_object" },
     messages: [
       {
         role: "system",

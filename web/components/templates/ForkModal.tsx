@@ -74,37 +74,37 @@ export function ForkModal({ template, projects, onClose }: ForkModalProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/75 backdrop-blur-md"
         onClick={onClose}
       />
 
-      {/* Modal */}
+      {/* Modal Card */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 8 }}
         transition={{ duration: 0.15 }}
-        className="relative w-full max-w-md rounded-2xl border border-border/50 bg-card shadow-2xl z-10"
+        className="relative w-full max-w-md rounded-2xl border border-white/15 bg-[#0E1017] shadow-2xl shadow-black/90 z-10 overflow-hidden"
       >
         <AnimatePresence mode="wait">
           {!done ? (
             <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               {/* Header */}
-              <div className="flex items-start justify-between p-5 border-b border-border/40">
+              <div className="flex items-start justify-between p-5 border-b border-white/10 bg-white/[0.02]">
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                    <GitForkIcon size={16} weight="duotone" className="text-primary" />
+                  <div className="h-10 w-10 rounded-xl bg-[#FFD15C]/15 border border-[#FFD15C]/30 flex items-center justify-center text-[#FFD15C] shadow-sm">
+                    <GitForkIcon size={18} weight="duotone" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-semibold text-foreground">{template.title}</h2>
-                    <p className="text-[11px] text-muted-foreground/60 mt-0.5">
-                      {template.endpointCount} endpoints · Fork into your project
+                    <h2 className="text-sm font-bold text-foreground">{template.title}</h2>
+                    <p className="text-[11px] font-mono text-muted-foreground/70 mt-0.5">
+                      {template.endpointCount} endpoints · Fork into workspace
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={onClose}
-                  className="h-7 w-7 rounded-lg flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-muted/30 transition-colors"
+                  className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground/60 hover:text-foreground hover:bg-white/10 transition-colors"
                 >
                   <XIcon size={14} />
                 </button>
@@ -112,70 +112,73 @@ export function ForkModal({ template, projects, onClose }: ForkModalProps) {
 
               {/* Content */}
               <div className="p-5 space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Fork into project
+                <div className="space-y-2">
+                  <label className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                    Select Target Project
                   </label>
 
                   {projects.length === 0 ? (
-                    <div className="rounded-xl border border-border/50 bg-muted/20 p-4 text-center">
-                      <p className="text-sm text-muted-foreground">No projects yet</p>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 text-center">
+                      <p className="text-sm text-muted-foreground">No projects found</p>
                       <p className="text-xs text-muted-foreground/60 mt-1">
-                        Create a project first from your dashboard
+                        Create a project first from your dashboard console
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                      {projects.map((project) => (
-                        <button
-                          key={project.id}
-                          onClick={() => setSelectedProject(project.id)}
-                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border text-left transition-all ${
-                            selectedProject === project.id
-                              ? "border-primary/30 bg-primary/5 text-foreground"
-                              : "border-border/50 bg-card/30 text-muted-foreground hover:text-foreground hover:bg-muted/20"
-                          }`}
-                        >
-                          <div className={`h-2 w-2 rounded-full shrink-0 ${
-                            selectedProject === project.id ? "bg-primary" : "bg-border"
-                          }`} />
-                          <span className="text-sm font-medium">{project.name}</span>
-                        </button>
-                      ))}
+                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                      {projects.map((project) => {
+                        const isSelected = selectedProject === project.id
+                        return (
+                          <button
+                            key={project.id}
+                            onClick={() => setSelectedProject(project.id)}
+                            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl border text-left transition-all ${
+                              isSelected
+                                ? "border-[#FFD15C]/50 bg-[#FFD15C]/15 text-foreground font-semibold shadow-sm"
+                                : "border-white/10 bg-white/[0.02] text-muted-foreground/80 hover:text-foreground hover:bg-white/[0.05]"
+                            }`}
+                          >
+                            <div className={`h-2.5 w-2.5 rounded-full shrink-0 ${
+                              isSelected ? "bg-[#FFD15C] shadow-[0_0_8px_rgba(255,209,92,0.8)]" : "bg-white/20"
+                            }`} />
+                            <span className="text-xs">{project.name}</span>
+                          </button>
+                        )
+                      })}
                     </div>
                   )}
                 </div>
 
-                <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
-                  <p className="text-[11px] text-amber-400/80 leading-relaxed">
-                    If the selected project already has a contract, it will be replaced with this template.
+                <div className="rounded-xl border border-[#FFD15C]/30 bg-[#FFD15C]/10 p-3">
+                  <p className="text-[11px] text-[#FFD15C] leading-relaxed">
+                    Forking will populate your project with preset endpoints, Zod contract schemas, and mock data handlers.
                   </p>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="flex items-center gap-2 px-5 pb-5">
+              <div className="flex items-center gap-3 px-5 pb-5">
                 <button
                   onClick={onClose}
-                  className="flex-1 h-9 rounded-lg border border-border/50 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors"
+                  className="flex-1 h-10 rounded-xl border border-white/15 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleFork}
                   disabled={loading || projects.length === 0}
-                  className="flex-1 h-9 rounded-lg bg-primary text-primary-foreground text-sm font-semibold
-                    hover:bg-primary/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                  className="flex-1 h-10 rounded-xl bg-[#FFD15C] text-black text-xs font-bold
+                    hover:bg-[#ffe18d] transition-all disabled:opacity-40 flex items-center justify-center gap-2 shadow-[2px_2px_0_rgba(0,0,0,0.6)] active:translate-y-0.5"
                 >
                   {loading ? (
                     <>
-                      <ArrowsClockwiseIcon size={14} className="animate-spin" />
+                      <ArrowsClockwiseIcon size={15} className="animate-spin" />
                       Forking...
                     </>
                   ) : (
                     <>
-                      <GitForkIcon size={14} weight="duotone" />
-                      Fork template
+                      <GitForkIcon size={15} weight="bold" />
+                      Fork Template
                     </>
                   )}
                 </button>
@@ -192,14 +195,14 @@ export function ForkModal({ template, projects, onClose }: ForkModalProps) {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-                className="h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"
+                className="h-16 w-16 rounded-full bg-[#B7FF3C]/15 border border-[#B7FF3C]/40 flex items-center justify-center shadow-lg shadow-[#B7FF3C]/10"
               >
-                <CheckCircleIcon size={28} weight="duotone" className="text-emerald-400" />
+                <CheckCircleIcon size={32} weight="bold" className="text-[#B7FF3C]" />
               </motion.div>
               <div>
-                <h3 className="text-base font-semibold text-foreground">Template forked</h3>
+                <h3 className="text-base font-bold text-foreground">Template Forked Successfully</h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Redirecting to your project...
+                  Redirecting to your project contract console...
                 </p>
               </div>
             </motion.div>
@@ -208,4 +211,4 @@ export function ForkModal({ template, projects, onClose }: ForkModalProps) {
       </motion.div>
     </div>
   )
-}
+}

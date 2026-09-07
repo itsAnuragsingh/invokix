@@ -1,5 +1,6 @@
 import { DocsPageWrapper } from "@/components/docs/DocsPageWrapper"
 import { DocsCode } from "@/components/docs/DocsCode"
+import { DocsImageCard } from "@/components/docs/DocsImageCard"
 import Link from "next/link"
 
 export const metadata = {
@@ -13,6 +14,12 @@ export const metadata = {
 <p className="text-base text-foreground/80 leading-relaxed mt-2 mb-8">
   Before any contract update is published, Invokix runs an automatic breaking change analysis. If dangerous changes are detected, you see exactly which teams will break and which files need updating — before a single line of production code is affected.
 </p>
+
+<DocsImageCard
+  src="/docs-breaking-changes.png"
+  alt="Pre-Publish Breaking Change Impact Detector"
+  caption="Pre-Publish Breaking Change Detector: Catch field renaming, payload schema breaking diffs, and affected consumer teams before publishing."
+/>
 
 ## What triggers the gate
 

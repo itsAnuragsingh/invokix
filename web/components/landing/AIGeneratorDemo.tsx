@@ -379,7 +379,7 @@ export function AIGeneratorDemo() {
         <div className="px-6 py-3 border-t border-white/5 bg-white/1 flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-4">
             <span className="text-[10px] text-zinc-600">
-              Free plan: Groq Llama 4 · Team plan: Claude Haiku · BYOK: your own key
+              Free plan: Groq Qwen 3.8 · Team plan: Claude Haiku · BYOK: your own key
             </span>
           </div>
           <div className="flex items-center gap-1.5">
