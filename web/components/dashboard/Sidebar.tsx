@@ -79,7 +79,7 @@ export function Sidebar({ user }: SidebarProps) {
             </div>
             {isExpanded && (
               <div className="min-w-0">
-                <p className="font-display font-bold text-sm tracking-tight text-foreground leading-none">Invokix</p>
+                <p className="font-display font-bold text-sm tracking-tight text-foreground leading-none">Invokix<span className="text-[#B7FF3C]">.</span></p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">API Contract Platform</p>
               </div>
             )}
@@ -245,7 +245,7 @@ export function Sidebar({ user }: SidebarProps) {
           <div className="relative h-6 w-6 rounded-md bg-primary flex items-center justify-center shadow shadow-primary/30">
             <LightningIcon weight="fill" className="h-3.5 w-3.5 text-white" />
           </div>
-          <span className="font-display font-bold text-sm text-foreground">Invokix</span>
+          <span className="font-display font-bold text-sm text-foreground">Invokix<span className="text-[#B7FF3C]">.</span></span>
         </div>
       </div>
 

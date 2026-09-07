@@ -132,7 +132,7 @@ export function HeroTerminal() {
   const terminalVisible = TERMINAL_STEPS.slice(0, terminalCount)
 
   return (
-    <div className="relative rounded-2xl border border-white/10 bg-[#0D1117] overflow-hidden shadow-2xl shadow-black/50">
+    <div className="relative rounded-none border border-[#B7FF3C]/55 bg-[#0D1117] overflow-hidden shadow-2xl shadow-black/50">
       {/* Title bar */}
       <div className="flex items-center gap-1.5 px-4 py-3 border-b border-white/5 bg-white/2">
         <div className="h-3 w-3 rounded-full bg-red-500/70" />

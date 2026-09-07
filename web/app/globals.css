@@ -178,6 +178,14 @@
   background-size: 32px 32px;
 }
 
+.workflow-grid {
+  background-image:
+    linear-gradient(rgba(129, 140, 248, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(129, 140, 248, 0.055) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, transparent, black 16%, black 84%, transparent);
+}
+
 /* Noise texture overlay */
 .noise::after {
   content: '';
