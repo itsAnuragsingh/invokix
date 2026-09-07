@@ -10,35 +10,66 @@ type OpenApiSpec = {
   [key: string]: unknown
 }
 
-export function mergeSpecs(existing: OpenApiSpec, incoming: OpenApiSpec): OpenApiSpec {
-  const existingPaths = existing.paths ?? {}
-  const incomingPaths = incoming.paths ?? {}
+export function mergeSpecs(existing: object, incoming: object): object {
+  const ex = existing as OpenApiSpec
+  const inc = incoming as OpenApiSpec
+  const existingPaths = ex.paths ?? {}
+  const incomingPaths = inc.paths ?? {}
 
-  // Only add new paths — never overwrite existing ones
+  // Merge paths and methods — never destroy existing ones, but enrich existing methods & responses
   const mergedPaths: Record<string, Record<string, unknown>> = { ...existingPaths }
   for (const [path, methods] of Object.entries(incomingPaths)) {
     if (!mergedPaths[path]) {
       mergedPaths[path] = methods as Record<string, unknown>
+    } else {
+      const mergedMethods: Record<string, unknown> = { ...mergedPaths[path] }
+      for (const [method, incDetails] of Object.entries(methods as Record<string, Record<string, unknown>>)) {
+        if (!mergedMethods[method]) {
+          mergedMethods[method] = incDetails
+        } else {
+          const exObj = (mergedMethods[method] ?? {}) as Record<string, unknown>
+          const incObj = (incDetails ?? {}) as Record<string, unknown>
+          mergedMethods[method] = {
+            ...exObj,
+            ...incObj,
+            responses: {
+              ...(exObj.responses as Record<string, unknown>),
+              ...(incObj.responses as Record<string, unknown>),
+            },
+          }
+        }
+      }
+      mergedPaths[path] = mergedMethods
     }
-    // path already exists — skip, protect existing
   }
 
-  // Merge schemas — incoming only adds, never overwrites
-  const existingSchemas = existing.components?.schemas ?? {}
-  const incomingSchemas = incoming.components?.schemas ?? {}
+  // Merge schemas — incoming adds new schemas and enriches existing property descriptions
+  const existingSchemas = ex.components?.schemas ?? {}
+  const incomingSchemas = inc.components?.schemas ?? {}
   const mergedSchemas: Record<string, unknown> = { ...existingSchemas }
   for (const [name, schema] of Object.entries(incomingSchemas)) {
     if (!mergedSchemas[name]) {
       mergedSchemas[name] = schema
+    } else {
+      const exSchema = (mergedSchemas[name] ?? {}) as Record<string, unknown>
+      const incSchema = (schema ?? {}) as Record<string, unknown>
+      mergedSchemas[name] = {
+        ...exSchema,
+        ...incSchema,
+        properties: {
+          ...(exSchema.properties as Record<string, unknown>),
+          ...(incSchema.properties as Record<string, unknown>),
+        },
+      }
     }
   }
 
   return {
-    ...existing,
+    ...ex,
     paths: mergedPaths,
     components: {
-      ...existing.components,
-      ...incoming.components,
+      ...ex.components,
+      ...inc.components,
       schemas: mergedSchemas,
     },
   }

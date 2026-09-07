@@ -70,13 +70,19 @@ export async function POST(request: Request) {
         projectId,
         incomingSpec,
         plainEnglish,
+        session.user.id
       );
       return ok({ contract, mode: "created" });
     }
 
     if (isEmptySpec(existing.openApiSpec)) {
       // Contract exists but has no endpoints — replace safely
-      const contract = await updateContract(existing.id, incomingSpec);
+      const contract = await updateContract(
+        existing.id,
+        incomingSpec,
+        session.user.id,
+        "Replaced contract with new specification"
+      );
       return ok({ contract, mode: "replaced" });
     }
 
@@ -85,7 +91,12 @@ export async function POST(request: Request) {
       existing.openApiSpec as Parameters<typeof mergeSpecs>[0],
       incomingSpec as Parameters<typeof mergeSpecs>[1],
     );
-    const contract = await updateContract(existing.id, merged);
+    const contract = await updateContract(
+      existing.id,
+      merged,
+      session.user.id,
+      "Added new endpoints with AI"
+    );
     return ok({ contract, mode: "merged" });
   } catch (e) {
     return err(

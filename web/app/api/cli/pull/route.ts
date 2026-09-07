@@ -3,9 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { verifyCliToken } from "@/lib/db/queries/cli"
 import { getContractByProjectId } from "@/lib/db/queries/contracts"
 import { getProjectById } from "@/lib/db/queries/projects"
-import { db } from "@/lib/db"
-import { consumers } from "@/lib/db/schema"
-import { nanoid } from "nanoid"
+import { logConsumer } from "@/lib/db/queries/consumers"
 import { generateTypes } from "@/lib/codegen/types"
 import { generateHooks, generateNativeHooks } from "@/lib/codegen/hooks"
 import { generateZodSchemas } from "@/lib/codegen/zod"
@@ -53,7 +51,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Get contract
+    // Get contract & latest published version
     const contract = await getContractByProjectId(projectId)
     if (!contract) {
       return NextResponse.json(
@@ -62,7 +60,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const spec = contract.openApiSpec as OpenAPIV3.Document
+    const { getVersionsByContractId } = await import("@/lib/db/queries/versions")
+    const versions = await getVersionsByContractId(contract.id)
+    const latestPublished = versions[0]
+
+    const spec = (latestPublished?.openApiSpec ?? contract.openApiSpec) as OpenAPIV3.Document
+    const currentVersion = latestPublished?.version ?? contract.version
+
     const files: Record<string, string> = {}
 
     // Generate requested outputs
@@ -79,20 +83,13 @@ export async function POST(req: NextRequest) {
       files["hooks-native"] = generateNativeHooks(spec)
     }
 
-    // Log consumer pull
-    await db.insert(consumers).values({
-      id: nanoid(),
-      contractId: contract.id,
-      userId: cliToken.userId,
-      version: contract.version,
-      lastPulledAt: new Date(),
-      source: "cli",
-    })
+    // Log consumer pull (upserting unique consumer state)
+    await logConsumer(contract.id, currentVersion, "cli", cliToken.userId)
 
     return NextResponse.json({
       success: true,
       data: {
-        version: contract.version,
+        version: currentVersion,
         contractId: contract.id,
         projectName: project.name,
         files,

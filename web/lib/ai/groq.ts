@@ -32,24 +32,20 @@ export async function generateSpecFromText(
   existingSpec?: object
 ): Promise<string> {
   const systemPrompt = existingSpec
-    ? `You are an OpenAPI 3.0 spec generator in EXTEND mode.
-The user already has an existing API spec. Your job is to generate ONLY the new endpoints they describe.
-Do NOT include any existing endpoints in your response.
-Match the existing spec's naming conventions, auth patterns, and response shapes exactly.
+    ? `You are an OpenAPI 3.0 spec generator in EXTEND/UPDATE mode.
+The user has an existing API spec and wants to add new endpoints or fix/update existing endpoints according to their instructions.
 
 Existing spec for context:
 ${JSON.stringify(existingSpec, null, 2)}
 
 Rules:
-- Respond with ONLY a valid OpenAPI 3.0 JSON spec — no explanation, no markdown, no code fences
-- Only include the NEW endpoints the user describes
-- Use the same auth scheme as the existing spec
-- Use the same response envelope shape as existing endpoints
-- Reuse existing schema names from components.schemas where appropriate
-- Every schema field must have a realistic example value
-- Number fields must have minimum: 0 unless negative values make sense
-- String IDs must have format: uuid and a realistic example
-- Enum fields must list all valid values`
+- Respond with ONLY a valid OpenAPI 3.0 JSON spec — no explanation, no markdown, no code fences.
+- If the user asks to fix health issues or missing responses/descriptions on existing endpoints, return the updated endpoint paths with proper summaries, descriptions, 200, 201, 400, 401, 403, and 500 response objects.
+- If the user describes new endpoints, include those new endpoint path definitions.
+- Match the existing spec's naming conventions, auth patterns, and response shapes.
+- Reuse existing schema names from components.schemas where appropriate.
+- Every schema field must have a realistic example value.
+- Every endpoint MUST include valid response definitions for success (200/201) and errors (400, 401, 500).`
     : `You are an OpenAPI 3.0 spec generator.
 The user will describe an API in plain English.
 You must respond with ONLY a valid OpenAPI 3.0 JSON spec — no explanation, no markdown, no code fences.

@@ -17,7 +17,25 @@ export async function getContractById(contractId: string) {
   })
 }
 
-export async function createContract(projectId: string, openApiSpec: object, plainEnglish?: string) {
+import { createVersion } from "@/lib/db/queries/versions"
+import { diffSpecs } from "@/lib/analysis/diff"
+
+export function bumpVersion(currentVersion: string = "1.0"): string {
+  const parts = currentVersion.split(".")
+  if (parts.length >= 2) {
+    const major = parseInt(parts[0], 10) || 1
+    const minor = parseInt(parts[1], 10) || 0
+    return `${major}.${minor + 1}`
+  }
+  return "1.1"
+}
+
+export async function createContract(
+  projectId: string,
+  openApiSpec: object,
+  plainEnglish?: string,
+  userId?: string
+) {
   const { score } = computeHealthScore(openApiSpec)
 
   const [contract] = await db.insert(contracts).values({
@@ -28,21 +46,64 @@ export async function createContract(projectId: string, openApiSpec: object, pla
     version: "1.0",
     healthScore: score,
   }).returning()
+
+  if (userId) {
+    await createVersion(
+      contract.id,
+      openApiSpec,
+      "1.0",
+      userId,
+      "Initial contract created",
+      false,
+      []
+    )
+  }
+
   return contract
 }
 
-export async function updateContract(contractId: string, openApiSpec: object, version?: string) {
+export async function updateContract(
+  contractId: string,
+  openApiSpec: object,
+  userId?: string,
+  summary?: string,
+  explicitVersion?: string
+) {
+  const current = await getContractById(contractId)
   const { score } = computeHealthScore(openApiSpec)
+
+  const isPublishing = Boolean(explicitVersion)
+  const nextVersion = explicitVersion ?? (current?.version ?? "1.0")
+
+  const diff = current?.openApiSpec
+    ? diffSpecs(current.openApiSpec as object, openApiSpec)
+    : { items: [], hasBreaking: false }
+
+  const breakingFields = diff.items.filter((i) => i.breaking).map((i) => i.message)
+  const changeSummary = summary ?? (diff.items.map((i) => i.message).join("; ") || "Updated API contract")
 
   const [updated] = await db.update(contracts)
     .set({
       openApiSpec,
       healthScore: score,
+      version: nextVersion,
       updatedAt: new Date(),
-      ...(version ? { version } : {}),
     })
     .where(eq(contracts.id, contractId))
     .returning()
+
+  if (userId && isPublishing) {
+    await createVersion(
+      contractId,
+      openApiSpec,
+      nextVersion,
+      userId,
+      changeSummary,
+      diff.hasBreaking,
+      breakingFields
+    )
+  }
+
   return updated
 }
 

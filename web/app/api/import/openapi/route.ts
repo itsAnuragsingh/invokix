@@ -4,6 +4,7 @@ import { ok, err } from "@/lib/api/response"
 import { parseOpenApiSpec } from "@/lib/import/openapi"
 import { getProjectById } from "@/lib/db/queries/projects"
 import { createContract, getContractByProjectId, updateContract } from "@/lib/db/queries/contracts"
+import { mergeSpecs, isEmptySpec } from "@/lib/ai/merge"
 import { z } from "zod"
 
 const schema = z.object({
@@ -28,9 +29,15 @@ export async function POST(request: Request) {
     const openApiSpec = await parseOpenApiSpec(spec)
 
     const existing = await getContractByProjectId(projectId)
-    const contract = existing
-      ? await updateContract(existing.id, openApiSpec)
-      : await createContract(projectId, openApiSpec)
+    let contract
+    if (!existing) {
+      contract = await createContract(projectId, openApiSpec, undefined, session.user.id)
+    } else if (isEmptySpec(existing.openApiSpec)) {
+      contract = await updateContract(existing.id, openApiSpec, session.user.id, "Imported OpenAPI specification")
+    } else {
+      const merged = mergeSpecs(existing.openApiSpec as object, openApiSpec as object)
+      contract = await updateContract(existing.id, merged, session.user.id, "Merged OpenAPI specification")
+    }
 
     return ok(contract)
   } catch (e) {

@@ -61,18 +61,12 @@ export async function POST(request: Request) {
 
     const newVersion = bumpVersion(contract.version)
 
-    await updateContract(contract.id, currentSpec, newVersion)
-
-    const breakingItems = diff.items.filter((i) => i.breaking)
-
-    await createVersion(
+    await updateContract(
       contract.id,
       currentSpec,
-      newVersion,
       session.user.id,
-      diff.items.map((i) => i.message).join("; ") || "No changes",
-      diff.hasBreaking,
-      breakingItems.map((i) => i.message)
+      diff.items.map((i) => i.message).join("; ") || "Published release",
+      newVersion
     )
 
     // Fire Slack alert — never block publish on failure
@@ -93,7 +87,8 @@ export async function POST(request: Request) {
     }
 
     return ok({ blocked: false, version: newVersion, diff: diff.items })
-  } catch {
-    return err("Something went wrong", "SERVER_ERROR", 500)
+  } catch (e) {
+    console.error("[contract/publish]", e)
+    return err(e instanceof Error ? e.message : "Publish failed", "SERVER_ERROR", 500)
   }
 }

@@ -3,9 +3,7 @@ import { requireSession } from "@/lib/auth/session"
 import { redirect, notFound } from "next/navigation"
 import { getProjectById } from "@/lib/db/queries/projects"
 import { getContractByProjectId } from "@/lib/db/queries/contracts"
-import { db } from "@/lib/db"
-import { consumers } from "@/lib/db/schema"
-import { eq } from "drizzle-orm"
+import { getConsumersByContractId } from "@/lib/db/queries/consumers"
 import { ConsumerTable } from "@/components/dashboard/ConsumerTable"
 import Link from "next/link"
 import { getUserPlan } from "@/lib/plans/usage"
@@ -62,10 +60,7 @@ export default async function ConsumersPage({ params }: Props) {
 }
 
 async function ConsumerTableWrapper({ contractId, contractVersion }: { contractId: string; contractVersion: string }) {
-  const contractConsumers = await db.query.consumers.findMany({
-    where: eq(consumers.contractId, contractId),
-    orderBy: (consumers, { desc }) => [desc(consumers.lastPulledAt)],
-  })
+  const contractConsumers = await getConsumersByContractId(contractId)
 
   return (
     <>
