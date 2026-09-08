@@ -1,5 +1,5 @@
 // src/lib/config.ts
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 const CONFIG_FILE = "invokix.config.json";
@@ -42,7 +42,7 @@ export function writeAuth(data) {
 }
 export function clearAuth() {
     if (existsSync(AUTH_FILE)) {
-        writeFileSync(AUTH_FILE, "", "utf-8");
+        unlinkSync(AUTH_FILE); // deletes the file completely
     }
 }
 export function isAuthenticated() {
