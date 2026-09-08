@@ -18,6 +18,7 @@ import {
   LightningIcon,
   ListIcon,
   ShieldCheckIcon,
+  ShareNetworkIcon,
   SignOutIcon,
   StackIcon,
   UserCircleIcon,
@@ -74,6 +75,7 @@ export function Sidebar({ user, projects }: SidebarProps) {
   const projectTools = projectId
     ? [
         { href: `/project/${projectId}`, label: "Contract", icon: LightningIcon, exact: true },
+        { href: `/project/${projectId}/flows`, label: "Flows", icon: ShareNetworkIcon },
         { href: `/project/${projectId}/history`, label: "History", icon: GitBranchIcon },
         { href: `/project/${projectId}/consumers`, label: "Consumers", icon: UsersIcon },
         { href: `/project/${projectId}/mock`, label: "Mock server", icon: CpuIcon },
