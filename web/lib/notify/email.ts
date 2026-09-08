@@ -2,7 +2,7 @@
 import { Resend } from "resend"
 
 const resend = new Resend(process.env.RESEND_API_KEY!)
-const FROM = process.env.FROM_EMAIL ?? 'InvoKix <onboarding@resend.dev>'
+const FROM = process.env.FROM_EMAIL ?? 'InvoKix <noreply@invokix.com>'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 
 export async function sendInviteEmail({
