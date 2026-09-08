@@ -5,6 +5,16 @@
 
 @custom-variant dark (&:is(.dark *));
 
+::selection {
+  background-color: #00F0FF !important;
+  color: #000000 !important;
+}
+
+::-moz-selection {
+  background-color: #00F0FF !important;
+  color: #000000 !important;
+}
+
 
 @theme inline {
   --color-background: var(--background);
