@@ -26,7 +26,7 @@ async function authenticate() {
             {
                 value: "browser",
                 label: "Browser login",
-                hint: "Opens invokix.dev in your browser — recommended",
+                hint: "Opens invokix.com in your browser — recommended",
             },
             {
                 value: "apikey",
