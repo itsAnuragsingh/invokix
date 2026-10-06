@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { db } from "@/lib/db"
 import * as schema from "@/lib/db/schema"
+import { sendWelcomeEmail } from "@/lib/notify/email"
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -14,6 +15,24 @@ export const auth = betterAuth({
       verification: schema.verifications,
     },
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          try {
+            if (user.email) {
+              await sendWelcomeEmail({
+                to: user.email,
+                name: user.name,
+              })
+            }
+          } catch (err) {
+            console.error("[welcome-email] Failed to send welcome email:", err)
+          }
+        },
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,

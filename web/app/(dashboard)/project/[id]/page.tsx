@@ -69,10 +69,12 @@ export default async function ProjectPage({ params }: Props) {
         <div className="absolute inset-y-0 left-0 w-1 bg-primary" />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="h-11 w-11 bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
-            <span className="text-primary font-display font-bold text-base">
-              {project.name.charAt(0).toUpperCase()}
-            </span>
+          <div className="h-11 w-11 rounded-lg overflow-hidden shrink-0 border border-border/40">
+            <img
+              src={`https://api.dicebear.com/10.x/moods/svg?tags=animation&seed=Felix-${Math.random().toString(36).slice(2, 8)}`}
+              alt={project.name}
+              className="h-full w-full object-cover"
+            />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2.5 flex-wrap">

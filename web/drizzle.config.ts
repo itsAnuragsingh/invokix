@@ -1,4 +1,6 @@
 // drizzle.config.ts
+import { config } from "dotenv"
+config({ path: ".env" })
 import type { Config } from "drizzle-kit"
 
 export default {
