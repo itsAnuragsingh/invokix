@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌐 Invokix Cloud — Web Platform & API Gateway
 
-## Getting Started
+This directory powers the **[Invokix](https://invokix.com)** cloud application, dashboard interface, and real-time API services.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Core Architecture
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Contract Workspace & Studio:** Interactive visual editor for OpenAPI 3.0 contracts, version diffs, and consumer tracking maps.
+- **AI Synthesis Pipeline:** Low-latency spec generation and additive merging powered by Groq and Anthropic models.
+- **Zero-Cold-Start Mock Proxy:** Dynamic, in-process API mock runtime (`/api/mock-proxy/:contractId/...`) delivering schema-accurate responses without external container latency.
+- **CLI Sync Gateway:** Secure OAuth browser handshakes and authenticated token distribution (`/api/cli/...`) for `npx invokix pull`.
+- **Signal Notification Dispatcher:** Automated webhook and email dispatch to Slack, Discord, and Resend on breaking changes.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Links & Resources
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Website:** [invokix.com](https://invokix.com)
+- **Documentation:** [invokix.com/docs](https://invokix.com/docs)
+- **Developer CLI:** `npx invokix pull`
+- **Main Overview:** [Project README](../README.md)

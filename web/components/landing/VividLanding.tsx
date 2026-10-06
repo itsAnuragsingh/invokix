@@ -12,6 +12,7 @@ import {
   FileTextIcon,
   GitBranchIcon,
   LinkIcon,
+  LockSimpleIcon,
   SlackLogoIcon,
   SparkleIcon,
   SpeakerHighIcon,
@@ -23,9 +24,30 @@ import { CodeRibbonSection, GenerationSection, SignalSystemSection } from "@/com
 import { HeroTerminal } from "@/components/landing/HeroTerminal"
 
 const plans = [
-  { name: "Free", price: "$0", tone: "bg-[#F2EFE8] text-[#171717]", items: ["1 API contract", "2 teammates", "10 AI generations"] },
-  { name: "Pro", price: "$19", tone: "bg-[#AE8CFF] text-[#170D2A]", items: ["Unlimited contracts", "Breaking-change gate", "Team alerts & consumer map"] },
-  { name: "Team", price: "$49", tone: "bg-[#B7FF3C] text-[#10100B]", items: ["Unlimited teammates", "Role-based access", "Contract analytics"] },
+  {
+    name: "Free",
+    priceUsd: "$0",
+    priceInr: "₹0",
+    tone: "bg-[#F2EFE8] text-[#171717]",
+    items: ["1 API contract", "2 teammates", "10 AI generations"],
+    isPaid: false,
+  },
+  {
+    name: "Pro",
+    priceUsd: "$19",
+    priceInr: "₹499",
+    tone: "bg-[#AE8CFF] text-[#170D2A]",
+    items: ["Unlimited contracts", "Breaking-change gate", "Team alerts & consumer map"],
+    isPaid: true,
+  },
+  {
+    name: "Team",
+    priceUsd: "$49",
+    priceInr: "₹999",
+    tone: "bg-[#B7FF3C] text-[#10100B]",
+    items: ["Unlimited teammates", "Role-based access", "Contract analytics"],
+    isPaid: true,
+  },
 ]
 
 function MagneticCta({ href, children, className }: { href: string; children: ReactNode; className: string }) {
@@ -474,6 +496,38 @@ function CustomCursor() {
 }
 
 export function VividLanding() {
+  const [isIndianUser, setIsIndianUser] = useState(false)
+
+  useEffect(() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+      const offset = new Date().getTimezoneOffset()
+      const isIndiaTz =
+        tz === "Asia/Kolkata" ||
+        tz === "Asia/Calcutta" ||
+        tz.toLowerCase().includes("kolkata") ||
+        tz.toLowerCase().includes("calcutta") ||
+        offset === -330 ||
+        navigator.language?.toLowerCase().includes("-in") ||
+        navigator.languages?.some((l) => l.toLowerCase().endsWith("-in"))
+
+      if (isIndiaTz) {
+        setIsIndianUser(true)
+      }
+    } catch {
+      // ignore
+    }
+
+    fetch("/api/geo")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.isIndia) {
+          setIsIndianUser(true)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
   return (
     <main className="landing-custom-cursor overflow-x-hidden bg-[#F2EFE8] text-[#171717] md:cursor-none">
       <CustomCursor />
@@ -504,7 +558,82 @@ export function VividLanding() {
       <ImpactScene />
       <NotificationsScene />
       <SignalSystemSection />
-      <section id="pricing" className="bg-[#170D2A] py-24 text-white sm:py-32"><div className="mx-auto max-w-7xl px-5 sm:px-8"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#C7B2FF]">Pricing</p><h2 className="mt-5 font-display text-5xl font-bold leading-[.86] tracking-[-.06em] sm:text-7xl">Pick your<br /><span className="text-[#B7FF3C]">release speed.</span></h2><div className="mt-14 grid gap-5 md:grid-cols-3">{plans.map((plan, index) => <motion.article key={plan.name} initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * .1 }} className={`${plan.tone} flex min-h-[370px] flex-col p-7 sm:p-8 ${index === 1 ? "shadow-[12px_14px_0_rgba(183,255,60,.4)] md:-translate-y-6" : ""}`}><p className="font-mono text-xs font-bold opacity-55">0{index + 1} / {plan.name.toUpperCase()}</p><p className="mt-8 font-display text-6xl font-bold tracking-[-.06em]">{plan.price}<span className="text-base tracking-normal">/mo</span></p><ul className="mt-7 space-y-3 text-xs font-semibold">{plan.items.map(item => <li key={item} className="flex gap-2"><CheckCircleIcon size={15} weight="fill" /> {item}</li>)}</ul><Link href="/register" className="mt-auto pt-8 text-sm font-bold">Choose {plan.name} <ArrowRightIcon size={15} className="ml-1 inline" /></Link></motion.article>)}</div></div></section>
+      <section id="pricing" className="bg-[#170D2A] py-24 text-white sm:py-32">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <p className="text-xs font-bold uppercase tracking-[.18em] text-[#C7B2FF]">Pricing</p>
+          <h2 className="mt-5 font-display text-5xl font-bold leading-[.86] tracking-[-.06em] sm:text-7xl">
+            Pick your<br />
+            <span className="text-[#B7FF3C]">release speed.</span>
+          </h2>
+
+          <div className="mt-14 grid gap-5 md:grid-cols-3">
+            {plans.map((plan, index) => {
+              const price = isIndianUser ? plan.priceInr : plan.priceUsd
+
+              return (
+                <motion.article
+                  key={plan.name}
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`${plan.tone} relative flex min-h-[390px] flex-col p-7 sm:p-8 ${
+                    index === 1 ? "shadow-[12px_14px_0_rgba(183,255,60,.4)] md:-translate-y-6" : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-mono text-xs font-bold opacity-55">
+                      0{index + 1} / {plan.name.toUpperCase()}
+                    </p>
+                    {plan.isPaid && (
+                      <span className="inline-flex items-center gap-1 rounded-sm border border-current/25 bg-current/10 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider">
+                        <LockSimpleIcon size={11} weight="bold" />
+                        Coming Soon
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="mt-8 font-display text-6xl font-bold tracking-[-.06em]">
+                    {price}
+                    <span className="text-base tracking-normal">/mo</span>
+                  </p>
+
+                  <ul className="mt-7 space-y-3 text-xs font-semibold">
+                    {plan.items.map((item) => (
+                      <li key={item} className="flex gap-2">
+                        <CheckCircleIcon size={15} weight="fill" className="shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {plan.isPaid ? (
+                    <div className="mt-auto pt-8">
+                      <button
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        className="inline-flex w-full items-center justify-center gap-2 border border-current/30 bg-current/10 px-4 py-3 text-xs font-bold uppercase tracking-wider opacity-65 cursor-not-allowed select-none transition-none pointer-events-none"
+                      >
+                        <LockSimpleIcon size={14} weight="bold" />
+                        <span>Coming Soon</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <Link
+                      href="/register"
+                      className="group mt-auto inline-flex items-center gap-1.5 pt-8 text-sm font-bold transition-all hover:translate-x-1"
+                    >
+                      <span>Choose {plan.name}</span>
+                      <ArrowRightIcon size={15} className="transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  )}
+                </motion.article>
+              )
+            })}
+          </div>
+        </div>
+      </section>
       <section className="bg-[#F2EFE8] py-24 sm:py-32"><div className="mx-auto max-w-4xl px-5 sm:px-8"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#625C55]">Questions, answered</p><h2 className="mt-5 font-display text-5xl font-bold leading-[.88] tracking-[-.06em] sm:text-6xl">Clear on the<br /><span className="text-[#77716A]">important things.</span></h2><div className="mt-14 border-t border-black/15">{[["Do I need an OpenAPI file?", "No. Start with a plain-English brief, import an existing spec, or use both."], ["Does Invokix replace our source code?", "No. It keeps generated artifacts and contract context aligned with the workflow you already own."], ["Can we start for free?", "Yes. The Free plan is made for trying your first contract without a card."]].map(([q, a]) => <details key={q} className="group border-b border-black/15 py-6"><summary className="flex cursor-pointer list-none justify-between gap-6 font-display text-xl font-bold sm:text-2xl">{q}<span className="text-[#F15A3C] transition-transform group-open:rotate-45">+</span></summary><p className="mt-4 max-w-xl text-sm leading-relaxed text-[#625C55]">{a}</p></details>)}</div></div></section>
       <section className="relative overflow-hidden bg-[#F15A3C] py-28 text-[#180C10] sm:py-40"><div className="absolute -bottom-36 -right-20 h-[500px] w-[500px] rounded-full border-[70px] border-[#FFB48E]" /><div className="relative mx-auto max-w-5xl px-5 text-center sm:px-8"><p className="text-xs font-bold uppercase tracking-[.18em] opacity-60">Give your API a home</p><h2 className="mt-8 font-display text-[clamp(4rem,10vw,9rem)] font-bold leading-[.78] tracking-[-.075em]">Stop shipping<br />surprises.</h2><MagneticCta href="/register" className="mt-11 inline-block bg-[#170D2A] px-7 py-4 text-sm font-bold text-white shadow-[8px_9px_0_rgba(24,12,16,.2)]">Start building for free <ArrowRightIcon size={16} className="ml-2 inline" /></MagneticCta></div></section>
       <footer className="flex flex-col justify-between gap-3 bg-[#170D2A] px-5 py-7 text-xs text-white/50 sm:flex-row sm:px-8"><span className="font-display text-lg font-bold text-white">Invokix<span className="text-[#B7FF3C]">.</span></span><span>One contract. Every team. In sync.</span><span>© 2026 Invokix</span></footer>

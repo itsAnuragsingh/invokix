@@ -144,9 +144,9 @@ export const PLANS = [
       "npx invokix pull",
       "Priority support",
     ],
-    cta: "Start free trial",
+    cta: "Coming Soon",
     highlighted: true,
-    comingSoon: false,
+    comingSoon: true,
   },
   {
     name: "Enterprise",
