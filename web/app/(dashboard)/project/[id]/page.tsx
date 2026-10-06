@@ -12,6 +12,7 @@ import { EditSpecModal } from "@/components/editor/EditSpecModal"
 import { ProjectStatBar } from "@/components/editor/ProjectStatBar"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
+import { ArrowSquareOutIcon, ShareNetworkIcon } from "@phosphor-icons/react/dist/ssr"
 import type { OpenAPIV3 } from "openapi-types"
 
 type Props = {
@@ -95,6 +96,16 @@ export default async function ProjectPage({ params }: Props) {
 
         {contract && (
           <div className="flex items-center gap-2 flex-wrap shrink-0">
+            <Link
+              href={`/share/${contract.id}`}
+              target="_blank"
+              className="inline-flex items-center gap-1.5 border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-colors shadow-sm"
+              title="Open public interactive share page"
+            >
+              <ShareNetworkIcon size={14} weight="bold" />
+              <span>Share Page</span>
+              <ArrowSquareOutIcon size={12} />
+            </Link>
             <EditSpecModal
               projectId={id}
               currentSpec={contract.openApiSpec as object}

@@ -12,7 +12,9 @@ import {
   ArrowsOutIcon,
   CodeIcon,
   CopyIcon,
+  TrashIcon,
 } from "@phosphor-icons/react"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { motion, AnimatePresence } from "motion/react"
@@ -74,7 +76,10 @@ const RESPONSE_CONFIG: Record<string, string> = {
 }
 
 export function EndpointList({ contract, projectId }: EndpointListProps) {
+  const router = useRouter()
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [deletingKey, setDeletingKey] = useState<string | null>(null)
+  const [confirmKey, setConfirmKey] = useState<string | null>(null)
   const spec = contract.openApiSpec as OpenApiSpec
   const endpoints: Endpoint[] = []
 
@@ -91,6 +96,30 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
   function copyPath(path: string) {
     navigator.clipboard.writeText(path)
     toast.success("Path copied")
+  }
+
+  async function deleteEndpoint(method: string, path: string) {
+    const key = `${method}:${path}`
+    setDeletingKey(key)
+    try {
+      const res = await fetch("/api/contract/endpoint/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId, method, path }),
+      })
+      const json = await res.json()
+      if (!json.success) {
+        toast.error(json.error ?? "Failed to delete endpoint")
+        return
+      }
+      toast.success(`Deleted ${method.toUpperCase()} ${path}`)
+      setConfirmKey(null)
+      router.refresh()
+    } catch {
+      toast.error("Failed to delete endpoint")
+    } finally {
+      setDeletingKey(null)
+    }
   }
 
   const methodSummary = endpoints.reduce<Record<string, number>>((counts, endpoint) => {
@@ -219,15 +248,47 @@ export function EndpointList({ contract, projectId }: EndpointListProps) {
                                 {method}
                               </Badge>
                               <span className="font-mono text-xs text-foreground flex-1 truncate">{path}</span>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-5 w-5 text-muted-foreground hover:text-foreground shrink-0"
-                                onClick={() => copyPath(path)}
-                                aria-label="Copy path"
-                              >
-                                <CopyIcon className="h-3 w-3" />
-                              </Button>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-5 w-5 text-muted-foreground hover:text-foreground shrink-0"
+                                  onClick={() => copyPath(path)}
+                                  aria-label="Copy path"
+                                >
+                                  <CopyIcon className="h-3 w-3" />
+                                </Button>
+                                {confirmKey === key ? (
+                                  <div className="flex items-center gap-1 bg-destructive/15 border border-destructive/30 px-1 py-0.5">
+                                    <button
+                                      type="button"
+                                      disabled={deletingKey === key}
+                                      onClick={() => deleteEndpoint(method, path)}
+                                      className="px-1.5 py-0.5 text-[10px] font-bold bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-none shadow-sm cursor-pointer"
+                                    >
+                                      {deletingKey === key ? "..." : "Delete?"}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setConfirmKey(null)}
+                                      className="px-1 py-0.5 text-[10px] text-muted-foreground hover:text-foreground cursor-pointer"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-5 w-5 text-muted-foreground/50 hover:text-destructive shrink-0 cursor-pointer"
+                                    onClick={() => setConfirmKey(key)}
+                                    aria-label="Delete endpoint"
+                                    title="Delete endpoint"
+                                  >
+                                    <TrashIcon className="h-3 w-3" />
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                           </div>
 

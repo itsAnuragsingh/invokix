@@ -1,6 +1,6 @@
 // app/api/mock-proxy/[contractId]/[...path]/route.ts
 import { NextRequest, NextResponse } from "next/server"
-import { getContractByProjectId } from "@/lib/db/queries/contracts"
+import { getContractByProjectId, getContractById } from "@/lib/db/queries/contracts"
 import { generateMockResponse } from "@/lib/codegen/mock"
 import type { OpenAPIV3 } from "openapi-types"
 
@@ -12,8 +12,10 @@ async function handler(
 ) {
   const { contractId, path } = await params
 
-  // 1. Load contract from DB
-  const contract = await getContractByProjectId(contractId)
+  // 1. Load contract from DB (checks both project ID and contract ID)
+  const contract =
+    (await getContractByProjectId(contractId)) ??
+    (await getContractById(contractId))
   if (!contract) {
     return NextResponse.json(
       { error: "Mock not found", code: "MOCK_NOT_FOUND" },

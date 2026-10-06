@@ -7,6 +7,7 @@ import { createVersion } from "@/lib/db/queries/versions"
 import { getNotificationsByProjectId } from "@/lib/db/queries/notifications"
 import { diffSpecs } from "@/lib/analysis/diff"
 import { sendSlackAlert } from "@/lib/notify/slack"
+import { sendDiscordAlert } from "@/lib/notify/discord"
 import { db } from "@/lib/db"
 import { projects } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
@@ -69,21 +70,34 @@ export async function POST(request: Request) {
       newVersion
     )
 
-    // Fire Slack alert — never block publish on failure
+    // Fire Slack & Discord alerts — never block publish on failure
     try {
       const notifications = await getNotificationsByProjectId(projectId)
-      if (notifications?.slackWebhookUrl && (notifications.alertOnAny || (notifications.alertOnBreaking && diff.hasBreaking))) {
+      const shouldAlert =
+        notifications &&
+        (notifications.alertOnAny || (notifications.alertOnBreaking && diff.hasBreaking))
+
+      if (shouldAlert) {
         const projectRow = await db.query.projects.findFirst({ where: eq(projects.id, projectId) })
-        await sendSlackAlert(notifications.slackWebhookUrl, {
+        const alertPayload = {
           projectName: projectRow?.name ?? projectId,
           contractTitle: (currentSpec as { info?: { title?: string } }).info?.title ?? "API Contract",
           version: newVersion,
           changedBy: session.user.email ?? session.user.id,
           diff: diff.items,
-        })
+        }
+
+        const promises: Promise<unknown>[] = []
+        if (notifications.slackWebhookUrl) {
+          promises.push(sendSlackAlert(notifications.slackWebhookUrl, alertPayload).catch((e) => console.error("[publish-slack-err]", e)))
+        }
+        if (notifications.discordWebhookUrl) {
+          promises.push(sendDiscordAlert(notifications.discordWebhookUrl, alertPayload).catch((e) => console.error("[publish-discord-err]", e)))
+        }
+        await Promise.allSettled(promises)
       }
     } catch {
-      // Slack failure never blocks publish
+      // Notification failure never blocks publish
     }
 
     return ok({ blocked: false, version: newVersion, diff: diff.items })

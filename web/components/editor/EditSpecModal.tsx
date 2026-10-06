@@ -87,7 +87,7 @@ export function EditSpecModal({
       const res = await fetch("/api/import/openapi", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, spec }),
+        body: JSON.stringify({ projectId, spec, mode: "replace" }),
       })
       const json = await res.json()
       if (!json.success) { toast.error(json.error ?? "Save failed"); return }

@@ -10,6 +10,7 @@ import { z } from "zod"
 const schema = z.object({
   projectId: z.string().min(1),
   spec: z.string().min(1),
+  mode: z.enum(["merge", "replace"]).default("merge"),
 })
 
 export async function POST(request: Request) {
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
     const parsed = schema.safeParse(body)
     if (!parsed.success) return err("Invalid request", "INVALID_REQUEST", 400)
 
-    const { projectId, spec } = parsed.data
+    const { projectId, spec, mode } = parsed.data
 
     const project = await getProjectById(projectId, session.user.id)
     if (!project) return err("Project not found", "NOT_FOUND", 404)
@@ -32,8 +33,13 @@ export async function POST(request: Request) {
     let contract
     if (!existing) {
       contract = await createContract(projectId, openApiSpec, undefined, session.user.id)
-    } else if (isEmptySpec(existing.openApiSpec)) {
-      contract = await updateContract(existing.id, openApiSpec, session.user.id, "Imported OpenAPI specification")
+    } else if (isEmptySpec(existing.openApiSpec) || mode === "replace") {
+      contract = await updateContract(
+        existing.id,
+        openApiSpec,
+        session.user.id,
+        mode === "replace" ? "Updated specification" : "Imported OpenAPI specification"
+      )
     } else {
       const merged = mergeSpecs(existing.openApiSpec as object, openApiSpec as object)
       contract = await updateContract(existing.id, merged, session.user.id, "Merged OpenAPI specification")
