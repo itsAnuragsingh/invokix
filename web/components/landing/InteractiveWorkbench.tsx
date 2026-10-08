@@ -171,7 +171,7 @@ export function InteractiveWorkbench() {
     clearTimeouts()
 
     const lines = [
-      "🚨 INVOKIX ALERT: Breaking changes published to API contract Orders API (v1.2) by Anurag",
+      "🚨 INVOKIX ALERT: Breaking changes published to API contract Orders API (v1.2) by Alex",
       "Affected downstream files discovered:",
       "  ↳ frontend/components/OrderGrid.tsx (line 42) -> totalAmount property updated to price",
       "  ↳ mobile/src/hooks/useCheckout.ts (line 119) -> userDetails updated to user",

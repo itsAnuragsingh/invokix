@@ -8,7 +8,7 @@ import { useInView } from "react-intersection-observer"
 const ROWS = [
   {
     time: "Tue 3pm",
-    person: "Anurag",
+    person: "Alex",
     action: "renames totalAmount → price in Orders API",
     personColor: "text-indigo-400",
     actionColor: "text-zinc-300",
@@ -16,7 +16,7 @@ const ROWS = [
   },
   {
     time: "Wed 9am",
-    person: "Shruti",
+    person: "Sarah",
     action: "spends 4 hours debugging broken checkout",
     personColor: "text-amber-400",
     actionColor: "text-amber-300/80",
@@ -24,7 +24,7 @@ const ROWS = [
   },
   {
     time: "Wed 2pm",
-    person: "Rahul",
+    person: "Marcus",
     action: "rewrites fetch functions from scratch. Again.",
     personColor: "text-amber-400",
     actionColor: "text-amber-300/80",
@@ -32,7 +32,7 @@ const ROWS = [
   },
   {
     time: "Fri demo",
-    person: "Vikram",
+    person: "David",
     action: "wonders why the client demo is broken. Again.",
     personColor: "text-red-400",
     actionColor: "text-red-300/80",

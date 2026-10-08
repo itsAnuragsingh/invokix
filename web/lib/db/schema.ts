@@ -7,6 +7,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
+  dodoCustomerId: text("dodo_customer_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 })
@@ -202,5 +203,13 @@ export const templates = pgTable("templates", {
   healthScore: integer("health_score").notNull().default(0),
   endpointCount: integer("endpoint_count").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+})
+
+export const platformSettings = pgTable("platform_settings", {
+  id: text("id").primaryKey().default("default"),
+  billingMode: text("billing_mode", { enum: ["beta", "all"] }).notNull().default("beta"),
+  betaEmails: text("beta_emails").array().notNull().default([]),
+  adminEmails: text("admin_emails").array().notNull().default([]),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 })

@@ -12,6 +12,8 @@ export type PlanLimits = {
   maxAiGenerationsPerMonth: number
   /** How many recent versions are visible (Infinity = all) */
   maxVisibleVersions: number
+  /** Max CLI tokens the user can create */
+  maxCliTokens: number
   /** Can roll back to a previous version */
   canRollback: boolean
   /** Breaking change detection gate */
@@ -38,17 +40,18 @@ export type PlanLimits = {
 
 export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
   free: {
-    maxContracts: 1,
-    maxTeamMembers: 2,
-    maxAiGenerationsPerMonth: 10,
-    maxVisibleVersions: 3,
-    canRollback: false,
+    maxContracts: 3,
+    maxTeamMembers: 3,
+    maxAiGenerationsPerMonth: 25,
+    maxVisibleVersions: 5,
+    maxCliTokens: 5,
+    canRollback: true,
     canBreakingChangeGate: false,
     canMockAndValidator: false,
     canEnvironments: false,
     canAlerts: false,
     canConsumerTracking: false,
-    canCli: false,
+    canCli: true,
     canSharePage: true,
     canMultipleWorkspaces: false,
     canRbac: false,
@@ -57,8 +60,9 @@ export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
   pro: {
     maxContracts: Infinity,
     maxTeamMembers: 10,
-    maxAiGenerationsPerMonth: 250,
+    maxAiGenerationsPerMonth: 500,
     maxVisibleVersions: Infinity,
+    maxCliTokens: Infinity,
     canRollback: true,
     canBreakingChangeGate: true,
     canMockAndValidator: true,
@@ -67,15 +71,16 @@ export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
     canConsumerTracking: true,
     canCli: true,
     canSharePage: true,
-    canMultipleWorkspaces: false,
-    canRbac: false,
-    canAnalytics: false,
+    canMultipleWorkspaces: true,
+    canRbac: true,
+    canAnalytics: true,
   },
   team: {
     maxContracts: Infinity,
-    maxTeamMembers: Infinity,
-    maxAiGenerationsPerMonth: Infinity,
+    maxTeamMembers: 10,
+    maxAiGenerationsPerMonth: 500,
     maxVisibleVersions: Infinity,
+    maxCliTokens: Infinity,
     canRollback: true,
     canBreakingChangeGate: true,
     canMockAndValidator: true,

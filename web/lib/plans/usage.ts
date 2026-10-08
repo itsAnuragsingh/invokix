@@ -14,7 +14,7 @@ export async function getUserPlan(userId: string): Promise<PlanName> {
     columns: { plan: true, expiresAt: true },
   })
 
-  if (!sub) return "pro"
+  if (!sub) return "free"
 
   if (sub.expiresAt && new Date() > sub.expiresAt) return "free"
 

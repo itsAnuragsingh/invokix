@@ -11,18 +11,13 @@ import { sendDiscordAlert } from "@/lib/notify/discord"
 import { db } from "@/lib/db"
 import { projects } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
+import { bumpVersion } from "@/lib/utils"
 import { z } from "zod"
 
 const schema = z.object({
   projectId: z.string().min(1),
   force: z.boolean().default(false),
 })
-
-function bumpVersion(current: string): string {
-  const parts = current.split(".").map(Number)
-  parts[parts.length - 1] += 1
-  return parts.join(".")
-}
 
 export async function POST(request: Request) {
   try {

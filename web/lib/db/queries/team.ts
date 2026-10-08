@@ -1,5 +1,5 @@
 // lib/db/queries/team.ts
-import { eq, and } from "drizzle-orm"
+import { eq, and, isNull, gt, desc } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { teamMembers, invites, projects, users } from "@/lib/db/schema"
 import { nanoid } from "nanoid"
@@ -80,7 +80,7 @@ export async function getPendingInvites(
     .where(
       and(
         eq(invites.projectId, projectId),
-        eq(invites.acceptedAt, null as unknown as Date)
+        isNull(invites.acceptedAt)
       )
     )
 }
@@ -103,7 +103,7 @@ export async function createInvite(
       and(
         eq(invites.projectId, projectId),
         eq(invites.email, email.toLowerCase()),
-        eq(invites.acceptedAt, null as unknown as Date)
+        isNull(invites.acceptedAt)
       )
     )
     .limit(1)
@@ -279,3 +279,62 @@ export async function revokeInvite(
 
   return result.length > 0
 }
+
+// ── Get pending invites for a logged-in user ──────────────────────────────────
+export type PendingUserInvite = {
+  id: string
+  token: string
+  role: "editor" | "viewer"
+  projectId: string
+  projectName: string
+  inviterName: string
+  inviterEmail: string
+  expiresAt: Date
+  createdAt: Date
+}
+
+export async function getPendingInvitesForUser(userEmail: string): Promise<PendingUserInvite[]> {
+  const rows = await db
+    .select({
+      id: invites.id,
+      token: invites.token,
+      role: invites.role,
+      projectId: invites.projectId,
+      projectName: projects.name,
+      inviterName: users.name,
+      inviterEmail: users.email,
+      expiresAt: invites.expiresAt,
+      createdAt: invites.createdAt,
+    })
+    .from(invites)
+    .innerJoin(projects, eq(invites.projectId, projects.id))
+    .innerJoin(users, eq(invites.invitedBy, users.id))
+    .where(
+      and(
+        eq(invites.email, userEmail.toLowerCase()),
+        isNull(invites.acceptedAt),
+        gt(invites.expiresAt, new Date())
+      )
+    )
+    .orderBy(desc(invites.createdAt))
+
+  return rows
+}
+
+// ── Decline invite by invitee ────────────────────────────────────────────────
+export async function declineInvite(
+  inviteId: string,
+  userEmail: string
+): Promise<boolean> {
+  const result = await db
+    .delete(invites)
+    .where(
+      and(
+        eq(invites.id, inviteId),
+        eq(invites.email, userEmail.toLowerCase())
+      )
+    )
+    .returning()
+
+  return result.length > 0
+}

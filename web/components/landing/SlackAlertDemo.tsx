@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { BellIcon, ArrowRightIcon } from "@phosphor-icons/react"
 
 const ALERT_LINES = [
-  { delay: 0,   text: "⚠️  Orders API — Breaking Change — Anurag", bold: true },
+  { delay: 0,   text: "⚠️  Orders API — Breaking Change — Alex", bold: true },
   { delay: 300, text: "v1.1 → v1.2", muted: true },
   { delay: 700, text: "" },
   { delay: 800, text: "Breaking changes:", bold: true },
@@ -49,11 +49,11 @@ export function SlackAlertDemo() {
       <div className="text-center mb-10">
         <p className="text-xs font-bold uppercase tracking-widest text-indigo-400/70 mb-4">Team alerts</p>
         <h2 className="font-display text-4xl font-bold text-white mb-4">
-          Shruti knows in{" "}
+          Sarah knows in{" "}
           <span className="text-indigo-400">30 seconds.</span>
         </h2>
         <p className="text-zinc-400 max-w-lg mx-auto text-sm">
-          Anurag publishes → Invokix detects the exact diff → every affected consumer notified instantly.
+          Alex publishes → Invokix detects the exact diff → every affected consumer notified instantly.
         </p>
       </div>
 

@@ -145,8 +145,8 @@ export default function AboutPage() {
           <div className="flex justify-center">
             {TEAM.map((member) => (
               <div key={member.name} className="text-center space-y-4 max-w-sm">
-                <div className={`h-20 w-20 rounded-2xl bg-gradient-to-br ${member.color} flex items-center justify-center mx-auto shadow-2xl`}>
-                  <span className="font-display font-bold text-2xl text-white">{member.avatar}</span>
+                <div className={`h-40 w-40 rounded-full bg-gradient-to-br ${member.color} flex items-center justify-center mx-auto shadow-2xl`}>
+                  <span className="font-display font-bold text-2xl text-white"><img src="https://ik.imagekit.io/itsanurag/invokix/founder.png" alt="" /></span>
                 </div>
                 <div>
                   <p className="font-semibold text-white text-lg">{member.name}</p>

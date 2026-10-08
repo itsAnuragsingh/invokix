@@ -29,23 +29,30 @@ const plans = [
     priceUsd: "$0",
     priceInr: "₹0",
     tone: "bg-[#F2EFE8] text-[#171717]",
-    items: ["1 API contract", "2 teammates", "10 AI generations"],
+    items: [
+      "3 API contracts & 3 team members",
+      "25 AI generations / month",
+      "Full CLI access (Types, Zod & React hooks)",
+      "Up to 5 CLI API tokens",
+      "5 versions history & public share pages",
+    ],
     isPaid: false,
   },
   {
     name: "Pro",
-    priceUsd: "$19",
+    priceUsd: "$9",
     priceInr: "₹499",
     tone: "bg-[#AE8CFF] text-[#170D2A]",
-    items: ["Unlimited contracts", "Breaking-change gate", "Team alerts & consumer map"],
-    isPaid: true,
-  },
-  {
-    name: "Team",
-    priceUsd: "$49",
-    priceInr: "₹999",
-    tone: "bg-[#B7FF3C] text-[#10100B]",
-    items: ["Unlimited teammates", "Role-based access", "Contract analytics"],
+    items: [
+      "Unlimited API contracts",
+      "10 team members & unlimited CLI tokens",
+      "500 AI generations / month",
+      "Breaking-change CI/CD gate",
+      "1-Click version rollback",
+      "Live mock server & response validator",
+      "Multi-environments (Dev, Staging, Prod)",
+      "Slack & Discord webhook alerts",
+    ],
     isPaid: true,
   },
 ]
@@ -180,7 +187,7 @@ function ProblemScene() {
 }
 
 function ImpactScene() {
-  return <section id="features" className="relative bg-[#170D2A] py-24 sm:py-32 overflow-hidden"><div className="absolute -left-32 top-0 h-[500px] w-[500px] rounded-full bg-[#AE8CFF]/30 blur-[90px]" /><div className="relative max-w-7xl mx-auto px-5 sm:px-8"><div className="grid lg:grid-cols-[.8fr_1.2fr] gap-12 items-center"><div className="text-white"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#C7B2FF]">The impact layer</p><h2 className="font-display text-5xl sm:text-6xl lg:text-7xl leading-[.86] tracking-[-.06em] font-bold mt-6">The change<br />is tiny.<br /><span className="text-[#B7FF3C]">The context is not.</span></h2><p className="max-w-sm mt-7 text-base leading-relaxed text-white/60">Trace the people, services, and files connected to a contract before the change becomes somebody else’s emergency.</p></div><motion.div initial={{ opacity: 0, scale: .94, y: 25 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true }} className="relative border border-white/15 bg-[#25153E] p-5 sm:p-7 shadow-[18px_20px_0_rgba(174,140,255,.32)]"><div className="flex justify-between text-xs text-white/55 font-mono"><span>orders-api / v1.2</span><span className="text-[#FFD15C]">3 owners affected</span></div><div className="mt-8 grid sm:grid-cols-[1fr_.9fr] gap-5"><div className="bg-[#120A20] p-5 border border-white/8"><p className="text-[10px] uppercase tracking-widest text-white/45">Contract diff</p><div className="mt-5 font-mono text-xs leading-8"><p className="text-red-300 bg-red-400/10 px-2">− totalAmount: number</p><p className="text-[#B7FF3C] bg-[#B7FF3C]/10 px-2">+ price: number</p><p className="text-red-300 bg-red-400/10 px-2">− userDetails: User</p><p className="text-[#B7FF3C] bg-[#B7FF3C]/10 px-2">+ user: User</p></div></div><div className="space-y-3">{[["Frontend", "Shruti", "#FFD15C"], ["Mobile", "Rahul", "#B7FF3C"], ["Partner", "PayCo", "#FF8FA9"]].map(([team, owner, color], i) => <motion.div key={team} animate={{ x: [0, i % 2 ? 5 : -5, 0] }} transition={{ duration: 3.5, repeat: Infinity, delay: i * .3 }} className="flex items-center gap-3 border border-white/10 bg-white/[.06] p-3"><span className="h-9 w-9 grid place-items-center" style={{ backgroundColor: `${color}22`, color }}><UsersThreeIcon size={18} weight="duotone" /></span><div><p className="text-xs font-bold text-white">{team}</p><p className="text-[10px] text-white/45">owner: {owner}</p></div><span className="ml-auto h-2 w-2 rounded-full" style={{ backgroundColor: color }} /></motion.div>)}</div></div><div className="absolute -bottom-7 right-5 sm:right-8 flex items-center gap-3 bg-[#FFD15C] text-[#281B00] px-5 py-4 font-bold shadow-xl"><BellRingingIcon size={21} weight="fill" /> Alert ready to send <ArrowRightIcon size={16} weight="bold" /></div></motion.div></div></div></section>
+  return <section id="features" className="relative bg-[#170D2A] py-24 sm:py-32 overflow-hidden"><div className="absolute -left-32 top-0 h-[500px] w-[500px] rounded-full bg-[#AE8CFF]/30 blur-[90px]" /><div className="relative max-w-7xl mx-auto px-5 sm:px-8"><div className="grid lg:grid-cols-[.8fr_1.2fr] gap-12 items-center"><div className="text-white"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#C7B2FF]">The impact layer</p><h2 className="font-display text-5xl sm:text-6xl lg:text-7xl leading-[.86] tracking-[-.06em] font-bold mt-6">The change<br />is tiny.<br /><span className="text-[#B7FF3C]">The context is not.</span></h2><p className="max-w-sm mt-7 text-base leading-relaxed text-white/60">Trace the people, services, and files connected to a contract before the change becomes somebody else’s emergency.</p></div><motion.div initial={{ opacity: 0, scale: .94, y: 25 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true }} className="relative border border-white/15 bg-[#25153E] p-5 sm:p-7 shadow-[18px_20px_0_rgba(174,140,255,.32)]"><div className="flex justify-between text-xs text-white/55 font-mono"><span>orders-api / v1.2</span><span className="text-[#FFD15C]">3 owners affected</span></div><div className="mt-8 grid sm:grid-cols-[1fr_.9fr] gap-5"><div className="bg-[#120A20] p-5 border border-white/8"><p className="text-[10px] uppercase tracking-widest text-white/45">Contract diff</p><div className="mt-5 font-mono text-xs leading-8"><p className="text-red-300 bg-red-400/10 px-2">− totalAmount: number</p><p className="text-[#B7FF3C] bg-[#B7FF3C]/10 px-2">+ price: number</p><p className="text-red-300 bg-red-400/10 px-2">− userDetails: User</p><p className="text-[#B7FF3C] bg-[#B7FF3C]/10 px-2">+ user: User</p></div></div><div className="space-y-3">{[["Frontend", "Sarah", "#FFD15C"], ["Mobile", "Marcus", "#B7FF3C"], ["Partner", "PayCo", "#FF8FA9"]].map(([team, owner, color], i) => <motion.div key={team} animate={{ x: [0, i % 2 ? 5 : -5, 0] }} transition={{ duration: 3.5, repeat: Infinity, delay: i * .3 }} className="flex items-center gap-3 border border-white/10 bg-white/[.06] p-3"><span className="h-9 w-9 grid place-items-center" style={{ backgroundColor: `${color}22`, color }}><UsersThreeIcon size={18} weight="duotone" /></span><div><p className="text-xs font-bold text-white">{team}</p><p className="text-[10px] text-white/45">owner: {owner}</p></div><span className="ml-auto h-2 w-2 rounded-full" style={{ backgroundColor: color }} /></motion.div>)}</div></div><div className="absolute -bottom-7 right-5 sm:right-8 flex items-center gap-3 bg-[#FFD15C] text-[#281B00] px-5 py-4 font-bold shadow-xl"><BellRingingIcon size={21} weight="fill" /> Alert ready to send <ArrowRightIcon size={16} weight="bold" /></div></motion.div></div></div></section>
 }
 
 function NotificationsScene() {
@@ -499,33 +506,18 @@ export function VividLanding() {
   const [isIndianUser, setIsIndianUser] = useState(false)
 
   useEffect(() => {
-    try {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""
-      const offset = new Date().getTimezoneOffset()
-      const isIndiaTz =
-        tz === "Asia/Kolkata" ||
-        tz === "Asia/Calcutta" ||
-        tz.toLowerCase().includes("kolkata") ||
-        tz.toLowerCase().includes("calcutta") ||
-        offset === -330 ||
-        navigator.language?.toLowerCase().includes("-in") ||
-        navigator.languages?.some((l) => l.toLowerCase().endsWith("-in"))
+    const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
+    const testGeo = params?.get("geo") || params?.get("country")
+    const url = testGeo ? `/api/geo?geo=${testGeo}` : "/api/geo"
 
-      if (isIndiaTz) {
-        setIsIndianUser(true)
-      }
-    } catch {
-      // ignore
-    }
-
-    fetch("/api/geo")
+    fetch(url)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data?.isIndia) {
-          setIsIndianUser(true)
-        }
+        setIsIndianUser(Boolean(data?.isIndia))
       })
-      .catch(() => {})
+      .catch(() => {
+        setIsIndianUser(false)
+      })
   }, [])
 
   return (
@@ -566,7 +558,7 @@ export function VividLanding() {
             <span className="text-[#B7FF3C]">release speed.</span>
           </h2>
 
-          <div className="mt-14 grid gap-5 md:grid-cols-3">
+          <div className="mt-14 grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
             {plans.map((plan, index) => {
               const price = isIndianUser ? plan.priceInr : plan.priceUsd
 
@@ -577,18 +569,22 @@ export function VividLanding() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className={`${plan.tone} relative flex min-h-[390px] flex-col p-7 sm:p-8 ${
-                    index === 1 ? "shadow-[12px_14px_0_rgba(183,255,60,.4)] md:-translate-y-6" : ""
+                  className={`${plan.tone} relative flex min-h-[420px] flex-col p-7 sm:p-9 ${
+                    index === 1 ? "shadow-[14px_16px_0_rgba(183,255,60,.4)] md:-translate-y-4" : ""
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-mono text-xs font-bold opacity-55">
                       0{index + 1} / {plan.name.toUpperCase()}
                     </p>
-                    {plan.isPaid && (
-                      <span className="inline-flex items-center gap-1 rounded-sm border border-current/25 bg-current/10 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider">
-                        <LockSimpleIcon size={11} weight="bold" />
-                        Coming Soon
+                    {plan.isPaid ? (
+                      <span className="inline-flex items-center gap-1 rounded-sm border border-current/25 bg-current/10 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider">
+                        <SparkleIcon size={11} weight="fill" />
+                        Full Access
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-sm border border-black/15 bg-black/5 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider">
+                        No Card Needed
                       </span>
                     )}
                   </div>
@@ -607,27 +603,25 @@ export function VividLanding() {
                     ))}
                   </ul>
 
-                  {plan.isPaid ? (
-                    <div className="mt-auto pt-8">
-                      <button
-                        type="button"
-                        disabled
-                        aria-disabled="true"
-                        className="inline-flex w-full items-center justify-center gap-2 border border-current/30 bg-current/10 px-4 py-3 text-xs font-bold uppercase tracking-wider opacity-65 cursor-not-allowed select-none transition-none pointer-events-none"
+                  <div className="mt-auto pt-8">
+                    {plan.isPaid ? (
+                      <Link
+                        href="/upgrade"
+                        className="group inline-flex w-full items-center justify-between bg-[#170D2A] px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-[4px_4px_0_rgba(23,13,42,.35)] transition-all hover:-translate-y-0.5 hover:shadow-[6px_6px_0_rgba(23,13,42,.45)]"
                       >
-                        <LockSimpleIcon size={14} weight="bold" />
-                        <span>Coming Soon</span>
-                      </button>
-                    </div>
-                  ) : (
-                    <Link
-                      href="/register"
-                      className="group mt-auto inline-flex items-center gap-1.5 pt-8 text-sm font-bold transition-all hover:translate-x-1"
-                    >
-                      <span>Choose {plan.name}</span>
-                      <ArrowRightIcon size={15} className="transition-transform group-hover:translate-x-1" />
-                    </Link>
-                  )}
+                        <span>Upgrade to Pro</span>
+                        <ArrowRightIcon size={15} className="transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/register"
+                        className="group inline-flex w-full items-center justify-between border border-black/20 bg-white/80 px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-[#171717] transition-all hover:bg-white"
+                      >
+                        <span>Start Free</span>
+                        <ArrowRightIcon size={15} className="transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    )}
+                  </div>
                 </motion.article>
               )
             })}

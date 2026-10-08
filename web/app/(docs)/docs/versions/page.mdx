@@ -25,10 +25,10 @@ Every snapshot stores the complete contract at that point in time — not just t
 Open the **History** tab in your project to see a full list of every version ever published:
 
 <DocsCode lang="text" title="Version history — Orders API">
-{`v1.3   Mar 8    Added GET /orders/search endpoint       Shruti
-v1.2   Mar 5    Renamed totalAmount → price             Anurag   BREAKING
-v1.1   Mar 3    Added status enum + GET /orders/:id     Anurag
-v1.0   Mar 1    Initial Orders API contract             Anurag`}
+{`v1.3   Mar 8    Added GET /orders/search endpoint       Sarah
+v1.2   Mar 5    Renamed totalAmount → price             Alex   BREAKING
+v1.1   Mar 3    Added status enum + GET /orders/:id     Alex
+v1.0   Mar 1    Initial Orders API contract             Alex`}
 </DocsCode>
 
 Breaking versions are flagged clearly. Click any version to see the full contract at that point in time.
@@ -60,13 +60,13 @@ A rollback is treated as a new publish — it triggers change alerts to your tea
 Every version has a human-readable changelog generated automatically from the diff. The changelog is visible on your shareable contract link — no manual writing required.
 
 <DocsCode lang="text" title="Auto-generated changelog">
-{`v1.2 — March 5, 2025  (Anurag)
+{`v1.2 — March 5, 2025  (Alex)
   BREAKING  Renamed totalAmount → price in Order schema
   BREAKING  Renamed userDetails → user object
   Added     Optional discount field on Order
   Removed   Deprecated legacyId field
 
-v1.1 — March 3, 2025  (Anurag)
+v1.1 — March 3, 2025  (Alex)
   Added     status enum — pending, shipped, delivered, cancelled
   Added     GET /orders/:id endpoint
   Updated   Order schema description`}

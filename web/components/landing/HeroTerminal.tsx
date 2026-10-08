@@ -18,7 +18,7 @@ const OUTPUT_CHIPS = [
 // ── Act 2 config ──────────────────────────────────────────────────────────────
 const TERMINAL_STEPS = [
   { delay: 0,    type: "input",   text: "$ npx invokix pull" },
-  { delay: 700,  type: "output",  text: "✔ Authenticated: anurag@startup.com" },
+  { delay: 700,  type: "output",  text: "✔ Authenticated: alex@company.com" },
   { delay: 1200, type: "output",  text: "✔ Contract: Orders API (v1.0)" },
   { delay: 1700, type: "output",  text: "✔ Writing: src/types/orders.ts" },
   { delay: 2100, type: "output",  text: "✔ Writing: src/hooks/useOrders.ts" },

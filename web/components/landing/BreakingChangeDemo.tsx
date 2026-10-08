@@ -37,7 +37,7 @@ export function BreakingChangeDemo() {
           <span className="text-zinc-500">before it ships.</span>
         </h2>
         <p className="text-zinc-400 max-w-lg mx-auto text-sm">
-          Click publish and see what Anurag sees before his change reaches Shruti's frontend.
+          Click publish and see what Alex sees before his change reaches Sarah's frontend.
         </p>
       </div>
 
@@ -140,8 +140,8 @@ export function BreakingChangeDemo() {
               <div className="text-xs text-zinc-400 space-y-1">
                 <p className="text-zinc-500 font-mono mb-2">Teams affected:</p>
                 {[
-                  "Shruti — Frontend Team (pulled 3 days ago)",
-                  "Rahul — Mobile Team (pulled 1 day ago)",
+                  "Sarah — Frontend Team (pulled 3 days ago)",
+                  "Marcus — Mobile Team (pulled 1 day ago)",
                   "PayCo — External Partner (on v1.0)",
                 ].map((team) => (
                   <div key={team} className="flex items-center gap-2 font-mono">
@@ -181,7 +181,7 @@ export function BreakingChangeDemo() {
               className="border-t border-emerald-500/20 bg-emerald-500/5 px-5 py-4 flex items-center gap-2 text-emerald-400 text-sm"
             >
               <CheckCircleIcon size={16} weight="fill" />
-              Publish cancelled — Shruti's checkout is safe. Talk to Anurag first.
+              Publish cancelled — Sarah's checkout is safe. Talk to Alex first.
             </motion.div>
           )}
           {state === "forced" && (
@@ -195,7 +195,7 @@ export function BreakingChangeDemo() {
                 Published. Slack alerts sent to 3 teams.
               </div>
               <p className="text-xs text-zinc-500 font-mono">
-                → Shruti — components/OrderCard.tsx (line 24, 31) needs update
+                → Sarah — components/OrderCard.tsx (line 24, 31) needs update
               </p>
             </motion.div>
           )}

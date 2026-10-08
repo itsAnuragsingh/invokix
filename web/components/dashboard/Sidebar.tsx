@@ -20,17 +20,24 @@ import {
   ShieldCheckIcon,
   ShareNetworkIcon,
   SignOutIcon,
+  SparkleIcon,
   StackIcon,
   UserCircleIcon,
   UsersIcon,
   XIcon,
+  CreditCardIcon,
 } from "@phosphor-icons/react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { signOut } from "@/lib/auth/client"
+import { isAdmin } from "@/lib/admin/auth"
 import type { User } from "better-auth"
 
-type SidebarProps = { user: User; projects: { id: string; name: string }[] }
+type SidebarProps = {
+  user: User
+  projects: { id: string; name: string }[]
+  isStaffAdmin?: boolean
+}
 
 const primary = [{ href: "/dashboard", label: "Overview", icon: HouseIcon }]
 
@@ -55,12 +62,15 @@ const resources = [
   },
 ]
 
-const settings = [
-  { href: "/settings/account", label: "Account", icon: UserCircleIcon },
-  { href: "/settings/api-keys", label: "API keys", icon: KeyIcon },
-]
-
-export function Sidebar({ user, projects }: SidebarProps) {
+export function Sidebar({ user, projects, isStaffAdmin }: SidebarProps) {
+  const userIsAdmin = isStaffAdmin !== undefined ? isStaffAdmin : isAdmin(user?.email)
+  const settings = [
+    ...(userIsAdmin ? [{ href: "/admin", label: "Admin Panel", icon: ShieldCheckIcon }] : []),
+    { href: "/billing", label: "Billing & Plans", icon: CreditCardIcon },
+    { href: "/upgrade", label: "Upgrade Plan", icon: SparkleIcon },
+    { href: "/settings/account", label: "Account", icon: UserCircleIcon },
+    { href: "/settings/api-keys", label: "API keys", icon: KeyIcon },
+  ]
   const pathname = usePathname()
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
@@ -74,15 +84,14 @@ export function Sidebar({ user, projects }: SidebarProps) {
   const projectId = projectMatch?.[1] ?? selectedProjectId
   const projectTools = projectId
     ? [
-        { href: `/project/${projectId}`, label: "Contract", icon: LightningIcon, exact: true },
-        { href: `/project/${projectId}/flows`, label: "Flows", icon: ShareNetworkIcon },
-        { href: `/project/${projectId}/history`, label: "History", icon: GitBranchIcon },
-        { href: `/project/${projectId}/consumers`, label: "Consumers", icon: UsersIcon },
-        { href: `/project/${projectId}/mock`, label: "Mock server", icon: CpuIcon },
-        { href: `/project/${projectId}/environments`, label: "Environments", icon: GlobeIcon },
-        { href: `/project/${projectId}/validator`, label: "Validator", icon: ShieldCheckIcon },
-        { href: `/project/${projectId}/settings`, label: "Project settings", icon: GearIcon },
-      ]
+      { href: `/project/${projectId}`, label: "Contract", icon: LightningIcon, exact: true },
+      { href: `/project/${projectId}/history`, label: "History", icon: GitBranchIcon },
+      { href: `/project/${projectId}/consumers`, label: "Consumers", icon: UsersIcon },
+      { href: `/project/${projectId}/mock`, label: "Mock server", icon: CpuIcon },
+      { href: `/project/${projectId}/environments`, label: "Environments", icon: GlobeIcon },
+      { href: `/project/${projectId}/validator`, label: "Validator", icon: ShieldCheckIcon },
+      { href: `/project/${projectId}/settings`, label: "Project settings", icon: GearIcon },
+    ]
     : []
 
   useEffect(() => {
@@ -298,8 +307,8 @@ export function Sidebar({ user, projects }: SidebarProps) {
                           ? "border-l-2 border-[#AE8CFF] bg-[#AE8CFF]/15 text-foreground"
                           : "border-l-2 border-[#FFD15C] bg-[#FFD15C]/15 text-foreground"
                         : isLavender
-                        ? "border-l-2 border-transparent text-muted-foreground hover:bg-[#AE8CFF]/10 hover:text-[#AE8CFF] hover:border-l-2 hover:border-[#AE8CFF]/80"
-                        : "border-l-2 border-transparent text-muted-foreground hover:bg-[#FFD15C]/10 hover:text-[#FFD15C] hover:border-l-2 hover:border-[#FFD15C]/80"
+                          ? "border-l-2 border-transparent text-muted-foreground hover:bg-[#AE8CFF]/10 hover:text-[#AE8CFF] hover:border-l-2 hover:border-[#AE8CFF]/80"
+                          : "border-l-2 border-transparent text-muted-foreground hover:bg-[#FFD15C]/10 hover:text-[#FFD15C] hover:border-l-2 hover:border-[#FFD15C]/80"
                     )}
                   >
                     <div

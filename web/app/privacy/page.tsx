@@ -31,7 +31,7 @@ export default function PrivacyPage() {
           <section className="space-y-4">
             <h2 className="font-display text-xl font-semibold text-white">1. Who we are</h2>
             <p>
-              Invokix (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is an API contract management platform operated by Anurag Singh.
+              Invokix (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is an API contract management platform.
               Our registered contact email is{" "}
               <a href="mailto:hello@invokix.com" className="text-indigo-400 hover:text-indigo-300 transition-colors">
                 hello@invokix.com

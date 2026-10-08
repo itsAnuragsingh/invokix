@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       return err(result.error, "INVITE_ERROR", 400)
     }
 
-    // Send email — wrapped in try/catch so a failed email doesn't block the response
+    // Send invite notification email with updated template
     try {
       await sendInviteEmail({
         to: email,

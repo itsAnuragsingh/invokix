@@ -13,6 +13,7 @@ import { ProjectStatBar } from "@/components/editor/ProjectStatBar"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
 import { ArrowSquareOutIcon, ShareNetworkIcon } from "@phosphor-icons/react/dist/ssr"
+import { NotificationBell } from "@/components/dashboard/NotificationBell"
 import type { OpenAPIV3 } from "openapi-types"
 
 type Props = {
@@ -53,16 +54,19 @@ export default async function ProjectPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-7xl animate-fade-up space-y-7">
 
-      {/* ── Breadcrumb ──────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 text-[11px] font-medium">
-        <Link
-          href="/dashboard"
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Projects
-        </Link>
-        <span className="text-muted-foreground/30 text-xs">/</span>
-        <span className="text-xs text-foreground/80 font-medium">{project.name}</span>
+      {/* ── Breadcrumb & Actions ───────────────────────────────────── */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-[11px] font-medium">
+          <Link
+            href="/dashboard"
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Projects
+          </Link>
+          <span className="text-muted-foreground/30 text-xs">/</span>
+          <span className="text-xs text-foreground/80 font-medium">{project.name}</span>
+        </div>
+        <NotificationBell />
       </div>
 
       {/* ── Header ──────────────────────────────────────────────────── */}

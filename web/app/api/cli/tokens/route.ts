@@ -22,6 +22,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Invalid request body", code: "INVALID_BODY" }, { status: 400 })
     }
 
+    const { getUserLimits } = await import("@/lib/plans/usage")
+    const { getCliTokensByUserId } = await import("@/lib/db/queries/cli")
+    const limits = await getUserLimits(session.user.id)
+    const existingTokens = await getCliTokensByUserId(session.user.id)
+
+    if (existingTokens.length >= limits.maxCliTokens) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `You've reached your limit of ${limits.maxCliTokens} CLI tokens on the ${limits.plan} plan. Upgrade to Pro for unlimited tokens.`,
+          code: "CLI_TOKEN_LIMIT_REACHED",
+        },
+        { status: 403 }
+      )
+    }
+
     const result = await createCliToken(session.user.id, parsed.data.name)
 
     return NextResponse.json({ success: true, data: result })

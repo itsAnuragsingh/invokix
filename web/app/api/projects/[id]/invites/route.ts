@@ -29,6 +29,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
     const invite = await createInvite(id, email, role as InviteRole, access.session!.user.id)  // ← InviteRole
 
+    // Send invite notification email with updated template
     sendInviteEmail({
       to: email,
       inviterName: access.session!.user.name,

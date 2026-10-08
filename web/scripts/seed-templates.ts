@@ -164,8 +164,8 @@ const TEMPLATES = [
                     type: "object",
                     required: ["name", "email", "password"],
                     properties: {
-                      name: { type: "string", example: "Anurag Singh" },
-                      email: { type: "string", format: "email", example: "anurag@company.com" },
+                      name: { type: "string", example: "Alex Rivera" },
+                      email: { type: "string", format: "email", example: "alex@company.com" },
                       password: { type: "string", minLength: 8, example: "securepassword123" },
                     },
                   },
@@ -185,7 +185,7 @@ const TEMPLATES = [
             tags: ["Auth"],
             requestBody: {
               required: true,
-              content: { "application/json": { schema: { type: "object", required: ["email", "password"], properties: { email: { type: "string", format: "email", example: "anurag@company.com" }, password: { type: "string", example: "securepassword123" } } } } },
+              content: { "application/json": { schema: { type: "object", required: ["email", "password"], properties: { email: { type: "string", format: "email", example: "alex@company.com" }, password: { type: "string", example: "securepassword123" } } } } },
             },
             responses: {
               "200": { description: "Login successful", content: { "application/json": { schema: { "$ref": "#/components/schemas/AuthResponse" } } } },
@@ -235,7 +235,7 @@ const TEMPLATES = [
             tags: ["Auth"],
             requestBody: {
               required: true,
-              content: { "application/json": { schema: { type: "object", required: ["email"], properties: { email: { type: "string", format: "email", example: "anurag@company.com" } } } } },
+              content: { "application/json": { schema: { type: "object", required: ["email"], properties: { email: { type: "string", format: "email", example: "alex@company.com" } } } } },
             },
             responses: {
               "200": { description: "Reset email sent" },
@@ -252,8 +252,8 @@ const TEMPLATES = [
             required: ["id", "name", "email"],
             properties: {
               id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" },
-              name: { type: "string", example: "Anurag Singh" },
-              email: { type: "string", format: "email", example: "anurag@company.com" },
+              name: { type: "string", example: "Alex Rivera" },
+              email: { type: "string", format: "email", example: "alex@company.com" },
               createdAt: { type: "string", format: "date-time", example: "2025-03-01T10:30:00Z" },
             },
           },
@@ -288,7 +288,7 @@ const TEMPLATES = [
           post: {
             summary: "Create a customer",
             tags: ["Customers"],
-            requestBody: { required: true, content: { "application/json": { schema: { type: "object", required: ["email"], properties: { email: { type: "string", format: "email", example: "user@company.com" }, name: { type: "string", example: "Anurag Singh" } } } } } },
+            requestBody: { required: true, content: { "application/json": { schema: { type: "object", required: ["email"], properties: { email: { type: "string", format: "email", example: "user@company.com" }, name: { type: "string", example: "Alex Rivera" } } } } } },
             responses: { "201": { description: "Customer created", content: { "application/json": { schema: { "$ref": "#/components/schemas/Customer" } } } }, "400": { description: "Invalid input" } },
           },
         },
@@ -332,7 +332,7 @@ const TEMPLATES = [
       components: {
         securitySchemes: { bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" } },
         schemas: {
-          Customer: { type: "object", properties: { id: { type: "string", example: "cus_abc123" }, email: { type: "string", format: "email", example: "user@company.com" }, name: { type: "string", example: "Anurag Singh" }, createdAt: { type: "string", format: "date-time", example: "2025-03-01T10:30:00Z" } } },
+          Customer: { type: "object", properties: { id: { type: "string", example: "cus_abc123" }, email: { type: "string", format: "email", example: "user@company.com" }, name: { type: "string", example: "Alex Rivera" }, createdAt: { type: "string", format: "date-time", example: "2025-03-01T10:30:00Z" } } },
           Subscription: { type: "object", properties: { id: { type: "string", example: "sub_abc123" }, customerId: { type: "string", example: "cus_abc123" }, status: { type: "string", enum: ["active", "canceled", "past_due", "trialing"], example: "active" }, priceId: { type: "string", example: "price_abc123" }, currentPeriodEnd: { type: "string", format: "date-time", example: "2025-04-01T00:00:00Z" } } },
           Invoice: { type: "object", properties: { id: { type: "string", example: "in_abc123" }, customerId: { type: "string", example: "cus_abc123" }, amount: { type: "integer", example: 4900 }, status: { type: "string", enum: ["draft", "open", "paid", "void"], example: "paid" }, dueDate: { type: "string", format: "date-time", example: "2025-04-01T00:00:00Z" } } },
         },
@@ -483,7 +483,7 @@ const TEMPLATES = [
       paths: {
         "/users/me": {
           get: { summary: "Get current user profile", tags: ["Profile"], responses: { "200": { description: "User profile", content: { "application/json": { schema: { "$ref": "#/components/schemas/UserProfile" } } } }, "401": { description: "Unauthorized" } } },
-          patch: { summary: "Update profile", tags: ["Profile"], requestBody: { required: true, content: { "application/json": { schema: { type: "object", properties: { name: { type: "string", example: "Anurag Singh" }, bio: { type: "string", example: "Full-stack developer" }, website: { type: "string", format: "uri", example: "https://anurag.dev" } } } } } }, responses: { "200": { description: "Profile updated", content: { "application/json": { schema: { "$ref": "#/components/schemas/UserProfile" } } } } } },
+          patch: { summary: "Update profile", tags: ["Profile"], requestBody: { required: true, content: { "application/json": { schema: { type: "object", properties: { name: { type: "string", example: "Alex Rivera" }, bio: { type: "string", example: "Full-stack developer" }, website: { type: "string", format: "uri", example: "https://example.com" } } } } } }, responses: { "200": { description: "Profile updated", content: { "application/json": { schema: { "$ref": "#/components/schemas/UserProfile" } } } } } },
           delete: { summary: "Delete account", tags: ["Profile"], responses: { "204": { description: "Account deleted" }, "401": { description: "Unauthorized" } } },
         },
         "/users/me/avatar": {
@@ -497,7 +497,7 @@ const TEMPLATES = [
       components: {
         securitySchemes: { bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" } },
         schemas: {
-          UserProfile: { type: "object", required: ["id", "name", "email"], properties: { id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" }, name: { type: "string", example: "Anurag Singh" }, email: { type: "string", format: "email", example: "anurag@company.com" }, bio: { type: "string", example: "Full-stack developer" }, avatarUrl: { type: "string", format: "uri", example: "https://cdn.example.com/avatar.jpg" }, website: { type: "string", format: "uri", example: "https://anurag.dev" }, createdAt: { type: "string", format: "date-time", example: "2025-03-01T10:30:00Z" } } },
+          UserProfile: { type: "object", required: ["id", "name", "email"], properties: { id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" }, name: { type: "string", example: "Alex Rivera" }, email: { type: "string", format: "email", example: "alex@company.com" }, bio: { type: "string", example: "Full-stack developer" }, avatarUrl: { type: "string", format: "uri", example: "https://cdn.example.com/avatar.jpg" }, website: { type: "string", format: "uri", example: "https://example.com" }, createdAt: { type: "string", format: "date-time", example: "2025-03-01T10:30:00Z" } } },
           Preferences: { type: "object", properties: { theme: { type: "string", enum: ["light", "dark", "system"], example: "dark" }, language: { type: "string", example: "en" }, notifications: { type: "boolean", example: true }, emailUpdates: { type: "boolean", example: false } } },
         },
       },
@@ -523,7 +523,7 @@ const TEMPLATES = [
           post: { summary: "Track multiple events", tags: ["Events"], requestBody: { required: true, content: { "application/json": { schema: { type: "object", required: ["events"], properties: { events: { type: "array", items: { type: "object", properties: { event: { type: "string", example: "page_viewed" }, userId: { type: "string", example: "user_abc123" } } } } } } } } }, responses: { "200": { description: "Events tracked" } } },
         },
         "/identify": {
-          post: { summary: "Identify a user", tags: ["Users"], requestBody: { required: true, content: { "application/json": { schema: { type: "object", required: ["userId"], properties: { userId: { type: "string", example: "user_abc123" }, traits: { type: "object", example: { name: "Anurag Singh", email: "anurag@company.com", plan: "pro" } } } } } } }, responses: { "200": { description: "User identified" } } },
+          post: { summary: "Identify a user", tags: ["Users"], requestBody: { required: true, content: { "application/json": { schema: { type: "object", required: ["userId"], properties: { userId: { type: "string", example: "user_abc123" }, traits: { type: "object", example: { name: "Alex Rivera", email: "alex@company.com", plan: "pro" } } } } } } }, responses: { "200": { description: "User identified" } } },
         },
         "/metrics": {
           get: { summary: "Query aggregated metrics", tags: ["Metrics"], parameters: [{ in: "query", name: "event", schema: { type: "string", example: "button_clicked" } }, { in: "query", name: "from", schema: { type: "string", format: "date-time", example: "2025-03-01T00:00:00Z" } }, { in: "query", name: "to", schema: { type: "string", format: "date-time", example: "2025-03-31T23:59:59Z" } }], responses: { "200": { description: "Aggregated metrics", content: { "application/json": { schema: { type: "object", properties: { total: { type: "integer", example: 1234 }, uniqueUsers: { type: "integer", example: 456 }, breakdown: { type: "array", items: { type: "object", properties: { date: { type: "string", example: "2025-03-01" }, count: { type: "integer", example: 45 } } } } } } } } } } },

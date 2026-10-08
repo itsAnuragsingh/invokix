@@ -82,7 +82,15 @@ export function TeamManager({
   // ── Send invite ─────────────────────────────────────────────────────────────
   async function handleInvite() {
     if (!email.trim()) { toast.error("Email is required"); return }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.error("Invalid email"); return }
+    const cleanEmail = email.trim().toLowerCase()
+    if (pending.some((p) => p.email.toLowerCase() === cleanEmail)) {
+      toast.error("An invite has already been sent to this email")
+      return
+    }
+    if (members.some((m) => m.user.email.toLowerCase() === cleanEmail)) {
+      toast.error("User is already a team member")
+      return
+    }
 
     setSending(true)
     try {
@@ -181,7 +189,7 @@ export function TeamManager({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleInvite()}
-              placeholder="shruti@startup.com"
+              placeholder="sarah@company.com"
               className="w-full bg-background border border-border/50 rounded-lg pl-8 pr-3 py-2 text-sm
                 text-foreground placeholder:text-muted-foreground/40 focus:outline-none
                 focus:border-primary/50 transition-colors"
@@ -354,7 +362,7 @@ export function TeamManager({
         <div className="rounded-xl border border-dashed border-border/40 bg-muted/10 p-8 text-center space-y-2">
           <UserPlusIcon size={24} className="text-muted-foreground/20 mx-auto" />
           <p className="text-sm text-muted-foreground/50">
-            Invite Shruti and Rahul — they&apos;ll always have the latest types.
+            Invite teammates and collaborators — they&apos;ll always have the latest types.
           </p>
         </div>
       )}

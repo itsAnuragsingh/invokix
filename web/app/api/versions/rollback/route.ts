@@ -6,6 +6,7 @@ import { getProjectById } from "@/lib/db/queries/projects"
 import { getContractByProjectId, updateContract } from "@/lib/db/queries/contracts"
 import { checkFeatureAccess } from "@/lib/plans/usage"
 import { PLAN_DISPLAY } from "@/lib/plans/limits"
+import { bumpVersion } from "@/lib/utils"
 import { z } from "zod"
 
 const schema = z.object({
@@ -43,9 +44,17 @@ export async function POST(request: Request) {
     const contract = await getContractByProjectId(projectId)
     if (!contract) return err("No contract found", "NO_CONTRACT", 404)
 
-    await updateContract(contract.id, version.openApiSpec as object, version.version)
+    const newVersion = bumpVersion(contract.version)
 
-    return ok({ version: version.version })
+    await updateContract(
+      contract.id,
+      version.openApiSpec as object,
+      session.user.id,
+      `Rolled back to v${version.version}`,
+      newVersion
+    )
+
+    return ok({ version: newVersion })
   } catch {
     return err("Something went wrong", "SERVER_ERROR", 500)
   }
